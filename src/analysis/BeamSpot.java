@@ -1,7 +1,7 @@
-package modules;
+package analysis;
 
-import modules.CDbeamSpot;
-import modules.DCbeamSpot;
+import analysis.CDbeamSpot;
+import analysis.DCbeamSpot;
 import objects.Particle;
 
 public class BeamSpot {

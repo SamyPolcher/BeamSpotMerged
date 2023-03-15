@@ -1,4 +1,4 @@
-package modules;
+package analysis;
 
 public class CDbeamSpot {
 	private String name;
