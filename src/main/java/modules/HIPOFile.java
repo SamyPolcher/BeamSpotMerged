@@ -21,7 +21,6 @@ public class HIPOFile {
 	public void saveHistograms() {
 		
 		String outputPrefix = bs.getOutputPrefix();
-		double[] theta_bins = bs.getThetaBins();
 		ArrayList<H2F> a_h2_z_phi =  bs.getA_h2_z_phi();
 		
 	  	System.out.println("Writing to: "+outputPrefix+"_histos.hipo ...");
