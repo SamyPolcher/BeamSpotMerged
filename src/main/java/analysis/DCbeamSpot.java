@@ -622,7 +622,10 @@ public class DCbeamSpot {
         System.out.println(String.format("### EVENT RATE:  %.4f kHz",n/bt.getSeconds()/1000));
         reader.close();
       }// end loop on input files
-
+      
+      // run the analysis
+      bs.analyze();
+      
       if (cli.getOption("-X").stringValue().equals("0")) {
     	HIPOFile hipo = new HIPOFile(bs);
     	TXTFile txt = new TXTFile(bs);
@@ -632,7 +635,6 @@ public class DCbeamSpot {
       }
     }
     if (cli.getOption("-B").stringValue().equals("0")) {
-      bs.analyze();
       bs.plot(cli.getOption("-X").stringValue().equals("0"));
     }
   }
