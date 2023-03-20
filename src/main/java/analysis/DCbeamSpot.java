@@ -272,6 +272,8 @@ public class DCbeamSpot {
     // for debug 
     ArrayList<H1F> z_slices = new ArrayList<H1F>();
     int ic = 0;
+    
+    System.out.println( "analysis(i)" );
 
     // loop  over the phi bins
     for( int i=0;i<h2_z_phi.getYAxis().getNBins(); i++ ){
@@ -279,12 +281,16 @@ public class DCbeamSpot {
       // get the phi slice
       H1F h = h2_z_phi.sliceY( i );
       h.setTitle("");
+      
+      
 
       if( h.integral() < 10 ) continue;  // to skip empty bins
+      System.out.println( "		Integral" );
 
       // check if the maximum is in the  expected range for the target window
       final double hmax = h.getAxis().getBinCenter( h.getMaximumBin() ) ;
       if( hmax < xmin || hmax > xmax ) continue;
+      System.out.println( "		MinMax" );
 
       // check the entries around the peak
       final double rms = getRMSInInterval( h, hmax - 5. , hmax + 5. );
@@ -298,6 +304,7 @@ public class DCbeamSpot {
 
       // skip if there are not enough entries
       if( h.integral( h.getAxis().getBin(rmin) , h.getAxis().getBin(rmax) ) < 50 ) continue;
+      System.out.println( "		NB entries" );
 
       // the fit function of the target window peak, a gaussian for simplicity
       // the fit range is +- RMS around the peak
