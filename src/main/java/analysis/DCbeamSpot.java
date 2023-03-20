@@ -138,7 +138,14 @@ public class DCbeamSpot {
   public String getOutputPrefix() { return outputPrefix; }
 
   public ArrayList<H2F> getA_h2_z_phi() { return a_h2_z_phi; }
+  
+  public GraphErrors getGZ() { return gZ;}
+  public GraphErrors getGR() { return gR;}
+  public GraphErrors getGP() { return gP;}
+  public GraphErrors getGX() { return gX;}
+  public GraphErrors getGY() { return gY;}
 
+  
   // processEvent   
   // ----------------------------------------- 
   public boolean processEvent( DataEvent event ){
@@ -175,7 +182,7 @@ public class DCbeamSpot {
       // fill the histograms
       h1_z.fill( part.getVz() );
       h1_phi.fill( part.getPhi() );
-
+      System.out.println( "Vz: "+part.getVz() + " Phi: "+ part.getPhi());
       a_h2_z_phi.get(bin).fill( part.getVz(), part.getPhi() );
     } // end loop over tracks
     return true;
@@ -455,7 +462,7 @@ public class DCbeamSpot {
     czframe.pack();
     czframe.setMinimumSize( new Dimension( 1400,904 ) );
     czframe.setVisible(true);
-
+    
     EmbeddedCanvasTabbed canvas = new EmbeddedCanvasTabbed( "Parameters" );
     for( int i=0; i<theta_bins.length-1; i++ ){
       String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
@@ -505,6 +512,8 @@ public class DCbeamSpot {
     frame.pack();
     frame.setMinimumSize( new Dimension( 800, 700 ) );
     frame.setVisible(true);
+    
+    System.out.println("cc");
 
     // save plots as png files
     if (write){
@@ -515,42 +524,7 @@ public class DCbeamSpot {
       }
       cp.save(outputPrefix+"_results.png");
     }
-
-    // save the results on a txt file
-    final double p0Z  = gZ.getFunction().getParameter(0);
-    final double Ep0Z = gZ.getFunction().parameter(0).error();
-    final double p0R  = gR.getFunction().getParameter(0);
-    final double Ep0R = gR.getFunction().parameter(0).error();
-    final double p0P  = gP.getFunction().getParameter(0);
-    final double Ep0P = gP.getFunction().parameter(0).error();
-    final double p0X  = gX.getFunction().getParameter(0);
-    final double Ep0X = gX.getFunction().parameter(0).error();
-    final double p0Y  = gY.getFunction().getParameter(0);
-    final double Ep0Y = gY.getFunction().parameter(0).error();
-
-    if (write) {
-      try {
-        System.out.println("Writing to: "+outputPrefix+"_results.txt ...");
-        FileWriter wr = new FileWriter( outputPrefix+"_results.txt" );
-        wr.write( "Z    = " + p0Z + " +- " + Ep0Z + "\n" );
-        wr.write( "R    = " + p0R + " +- " + Ep0R + "\n" );
-        wr.write( "Phi0 = " + p0P + " +- " + Ep0P + "\n" );
-        wr.write( "X    = " + p0X + " +- " + Ep0X + "\n" );
-        wr.write( "Y    = " + p0Y + " +- " + Ep0Y + "\n" );
-        wr.close();
-      } catch ( IOException e ) {} 
-
-      // writing CCDB tables
-      try {
-        System.out.println("Writing to: "+outputPrefix+"_ccdb_table.txt ...");
-        PrintWriter wr = new PrintWriter( outputPrefix+"_ccdb_table.txt" );
-        wr.printf( "# x y ex ey\n" );
-        wr.printf( "0 0 0 " );
-        wr.printf(  "%.2f %.2f %.2f %.2f\n", p0X ,p0Y, Ep0X,Ep0Y );
-        //wr.write(  p0X + " " +p0Y + " " + Ep0X + " " + Ep0Y + "\n" );
-        wr.close();
-      } catch ( IOException e ) {}
-    }
+    System.out.println("cc");
   }
 
 
@@ -577,6 +551,8 @@ public class DCbeamSpot {
     }
 
     DCbeamSpot bs = new DCbeamSpot(cli.getOption("-O").stringValue());
+    HIPOFile hipo = new HIPOFile(bs);
+	TXTFile txt = new TXTFile(bs);
 
     // set the theta bin edges
     bs.setThetaBins( new double[]{10,11,12,13,14,16,18,22,30} );
@@ -597,12 +573,11 @@ public class DCbeamSpot {
     // call the init method to properly setup all the parameters
     bs.init();
 
+    // fill the a_h2_z_phi with the necessary data for the analysis
     if( !cli.getOption("-H").stringValue().equals("0") ) {
-      HIPOFile hipo = new HIPOFile(bs);
       hipo.readHistograms(cli.getInputList());
     }
     else if( !cli.getOption("-T").stringValue().equals("0") ) {
-      TXTFile txt = new TXTFile(bs);
       txt.readHistogramsFromTXT(cli.getInputList());
     }
     else {
@@ -621,22 +596,24 @@ public class DCbeamSpot {
         bt.pause();
         System.out.println(String.format("### EVENT RATE:  %.4f kHz",n/bt.getSeconds()/1000));
         reader.close();
-      }// end loop on input files
+      	}// end loop on input files
       
-      // run the analysis
-      bs.analyze();
-      
-      if (cli.getOption("-X").stringValue().equals("0")) {
-    	HIPOFile hipo = new HIPOFile(bs);
-    	TXTFile txt = new TXTFile(bs);
-    	
-        txt.saveHistogramsToTXT();
-        hipo.saveHistograms();
-      }
+        // if the Run "with no output files" has not been selected the data is stored
+        if (cli.getOption("-X").stringValue().equals("0")) {
+	        txt.saveHistogramsToTXT();
+	        hipo.saveHistograms();
+        }
     }
+      
+    // run the analysis
+    bs.analyze();
+    txt.writeResults();
+      
+      
     if (cli.getOption("-B").stringValue().equals("0")) {
       bs.plot(cli.getOption("-X").stringValue().equals("0"));
     }
+    
   }
 
 }

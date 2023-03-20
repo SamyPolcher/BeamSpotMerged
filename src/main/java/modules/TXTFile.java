@@ -5,6 +5,7 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -123,4 +124,42 @@ public class TXTFile {
 	  public void readHistogramsFromTXT(List<String> filenames) {
 	    for (String f : filenames) readHistogramsFromTXT(f);
 	  }
+	  
+	  // save the results on a txt file
+	  public void writeResults() {
+		  
+		  	String outputPrefix = bs.getOutputPrefix();
+		    final double p0Z  = bs.getGZ().getFunction().getParameter(0);
+		    final double Ep0Z = bs.getGZ().getFunction().parameter(0).error();
+		    final double p0R  = bs.getGR().getFunction().getParameter(0);
+		    final double Ep0R = bs.getGR().getFunction().parameter(0).error();
+		    final double p0P  = bs.getGP().getFunction().getParameter(0);
+		    final double Ep0P = bs.getGP().getFunction().parameter(0).error();
+		    final double p0X  = bs.getGX().getFunction().getParameter(0);
+		    final double Ep0X = bs.getGX().getFunction().parameter(0).error();
+		    final double p0Y  = bs.getGY().getFunction().getParameter(0);
+		    final double Ep0Y = bs.getGY().getFunction().parameter(0).error();
+
+		    try {
+			    System.out.println("Writing to: "+outputPrefix+"_results.txt ...");
+			    FileWriter wr = new FileWriter( outputPrefix+"_results.txt" );
+			    wr.write( "Z    = " + p0Z + " +- " + Ep0Z + "\n" );
+			    wr.write( "R    = " + p0R + " +- " + Ep0R + "\n" );
+			    wr.write( "Phi0 = " + p0P + " +- " + Ep0P + "\n" );
+			    wr.write( "X    = " + p0X + " +- " + Ep0X + "\n" );
+			    wr.write( "Y    = " + p0Y + " +- " + Ep0Y + "\n" );
+		    wr.close();
+		    } catch ( IOException e ) {} 
+		
+		  // writing CCDB tables
+		    try {
+			    System.out.println("Writing to: "+outputPrefix+"_ccdb_table.txt ...");
+			    PrintWriter wr = new PrintWriter( outputPrefix+"_ccdb_table.txt" );
+			    wr.printf( "# x y ex ey\n" );
+			    wr.printf( "0 0 0 " );
+			    wr.printf(  "%.2f %.2f %.2f %.2f\n", p0X ,p0Y, Ep0X,Ep0Y );
+			    //wr.write(  p0X + " " +p0Y + " " + Ep0X + " " + Ep0Y + "\n" );
+			    wr.close();
+		    } catch ( IOException e ) {}
+			}
 }
