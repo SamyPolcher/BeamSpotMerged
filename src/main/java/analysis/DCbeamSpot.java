@@ -281,8 +281,15 @@ public class DCbeamSpot {
       // get the phi slice
       H1F h = h2_z_phi.sliceY( i );
       h.setTitle("");
-      
-      
+
+      JFrame frame = new JFrame("Basic GROOT Demo");
+		EmbeddedCanvas canvas = new EmbeddedCanvas();
+		frame.setSize(800,500);
+
+		canvas.draw(h);
+		frame.add(canvas);
+		frame.setLocationRelativeTo(null);
+		frame.setVisible(true);
 
       if( h.integral() < 10 ) continue;  // to skip empty bins
       System.out.println( "		Integral" );
@@ -515,7 +522,7 @@ public class DCbeamSpot {
     this.zoom(gR, cp.getPad(4).getAxisY());
 
     canvas.setActiveCanvas( "Parameters" );
-
+   
     JFrame frame = new JFrame("BeamSpot - Modulation Fits");
     frame.add(canvas);
     frame.pack();
