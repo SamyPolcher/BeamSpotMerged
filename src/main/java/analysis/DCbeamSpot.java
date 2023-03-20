@@ -309,6 +309,8 @@ public class DCbeamSpot {
       func.setParameter(4, .01 );
       func.setOptStat(110);
       DataFitter.fit( func, h, "Q" );
+      
+      System.out.println( "x: "+h2_z_phi.getYAxis().getBinCenter( i ) + " y: "+ func.getParameter(1));
 
       // skip if Gaussian amplitude too small:
       if (func.getParameter(0) < 8) continue;
@@ -322,8 +324,6 @@ public class DCbeamSpot {
       // skip if chi-square bad:
       if (func.getChiSquare()/func.getNDF() < 0.05) continue;
       if (func.getChiSquare()/func.getNDF() > 10) continue;
-      
-      System.out.println( "x: "+h2_z_phi.getYAxis().getBinCenter( i ) + " y: "+ func.getParameter(1));
 
       // store the fir result in the corresponding graph
       g_results.addPoint( 
