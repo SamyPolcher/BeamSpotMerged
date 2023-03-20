@@ -256,6 +256,7 @@ public class DCbeamSpot {
 
   // analysis of one theta bin
   // ------------------------------------
+
   public void analyze( int i_theta_bin ) {
 
     GraphErrors g_results = a_g_results.get(i_theta_bin);
@@ -265,14 +266,12 @@ public class DCbeamSpot {
     // and fit with a gaussian around the target window position
 
     // peak validity window:
-    final double xmin = 20.;
-    final double xmax = 31.;
+    final double xmin = targetZ - 6.;
+    final double xmax = targetZ + 6.;
 
     // for debug 
     ArrayList<H1F> z_slices = new ArrayList<H1F>();
     int ic = 0;
-    
-    System.out.println( "analysis(i)" );
 
     // loop  over the phi bins
     for( int i=0;i<h2_z_phi.getYAxis().getNBins(); i++ ){
@@ -281,22 +280,11 @@ public class DCbeamSpot {
       H1F h = h2_z_phi.sliceY( i );
       h.setTitle("");
 
-      JFrame frame = new JFrame("Basic GROOT Demo");
-		EmbeddedCanvas canvas = new EmbeddedCanvas();
-		frame.setSize(800,500);
-
-		canvas.draw(h);
-		frame.add(canvas);
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
-
       if( h.integral() < 10 ) continue;  // to skip empty bins
-      System.out.println( "		Integral" );
 
       // check if the maximum is in the  expected range for the target window
       final double hmax = h.getAxis().getBinCenter( h.getMaximumBin() ) ;
       if( hmax < xmin || hmax > xmax ) continue;
-      System.out.println( "		MinMax" );
 
       // check the entries around the peak
       final double rms = getRMSInInterval( h, hmax - 5. , hmax + 5. );
@@ -310,7 +298,6 @@ public class DCbeamSpot {
 
       // skip if there are not enough entries
       if( h.integral( h.getAxis().getBin(rmin) , h.getAxis().getBin(rmax) ) < 50 ) continue;
-      System.out.println( "		NB entries" );
 
       // the fit function of the target window peak, a gaussian for simplicity
       // the fit range is +- RMS around the peak
@@ -322,8 +309,6 @@ public class DCbeamSpot {
       func.setParameter(4, .01 );
       func.setOptStat(110);
       DataFitter.fit( func, h, "Q" );
-      
-      System.out.println( "x: "+h2_z_phi.getYAxis().getBinCenter( i ) + " y: "+ func.getParameter(1));
 
       // skip if Gaussian amplitude too small:
       if (func.getParameter(0) < 8) continue;
@@ -370,104 +355,6 @@ public class DCbeamSpot {
 
   // useful functions
   // ---------------- 
-  public void analyze( int i_theta_bin ) {
-
-	    GraphErrors g_results = a_g_results.get(i_theta_bin);
-	    H2F h2_z_phi = a_h2_z_phi.get(i_theta_bin);
-
-	    // loop over the phi bins of the 2D histogram phi vs z
-	    // and fit with a gaussian around the target window position
-
-	    // peak validity window:
-	    final double xmin = targetZ - 6.;
-	    final double xmax = targetZ + 6.;
-
-	    // for debug 
-	    ArrayList<H1F> z_slices = new ArrayList<H1F>();
-	    int ic = 0;
-
-	    // loop  over the phi bins
-	    for( int i=0;i<h2_z_phi.getYAxis().getNBins(); i++ ){
-
-	      // get the phi slice
-	      H1F h = h2_z_phi.sliceY( i );
-	      h.setTitle("");
-
-	      if( h.integral() < 10 ) continue;  // to skip empty bins
-
-	      // check if the maximum is in the  expected range for the target window
-	      final double hmax = h.getAxis().getBinCenter( h.getMaximumBin() ) ;
-	      if( hmax < xmin || hmax > xmax ) continue;
-
-	      // check the entries around the peak
-	      final double rms = getRMSInInterval( h, hmax - 5. , hmax + 5. );
-	      double rmin = h.getAxis().getBinCenter( h.getMaximumBin() ) - 2.0*rms*fitRangeScale;
-	      double rmax = h.getAxis().getBinCenter( h.getMaximumBin() ) + 1.5*rms*fitRangeScale;
-
-	      // truncate fit range if out of bounds:
-	      if (rmin < h.getAxis().getBinCenter(1)) rmin = h.getAxis().getBinCenter(1);
-	      if (rmax > h.getAxis().getBinCenter(h.getAxis().getNBins()-1))
-	        rmax = h.getAxis().getBinCenter(h.getAxis().getNBins()-1);
-
-	      // skip if there are not enough entries
-	      if( h.integral( h.getAxis().getBin(rmin) , h.getAxis().getBin(rmax) ) < 50 ) continue;
-
-	      // the fit function of the target window peak, a gaussian for simplicity
-	      // the fit range is +- RMS around the peak
-	      F1D func = new F1D( "func"+i, "[amp]*gaus(x,[mean],[sigma]) + [c] + [d]*x", rmin, rmax ); 
-	      func.setParameter(0, h.getBinContent( h.getMaximumBin() ) );
-	      func.setParameter(1, h.getAxis().getBinCenter( h.getMaximumBin() )  ); 
-	      func.setParameter(2, rms/2. );
-	      func.setParameter(3, 1. );
-	      func.setParameter(4, .01 );
-	      func.setOptStat(110);
-	      DataFitter.fit( func, h, "Q" );
-
-	      // skip if Gaussian amplitude too small:
-	      if (func.getParameter(0) < 8) continue;
-
-	      // skip if Gaussian sigma too small:
-	      if (Math.abs(func.getParameter(2)) < 0.1) continue;
-
-	      // skip if Gaussian sigma too big:
-	      if (Math.abs(func.getParameter(2)) > 2) continue;
-
-	      // skip if chi-square bad:
-	      if (func.getChiSquare()/func.getNDF() < 0.05) continue;
-	      if (func.getChiSquare()/func.getNDF() > 10) continue;
-
-	      // store the fir result in the corresponding graph
-	      g_results.addPoint( 
-	          h2_z_phi.getYAxis().getBinCenter( i ),
-	          func.getParameter(1),
-	          0,
-	          func.parameter(1).error() );
-
-	      z_slices.add( h );
-
-	    } // end loop over bins
-
-	    // debug
-	    a_hz.add( z_slices );
-
-	    // extract the modulation of the target z position versus phi by fitting the graph
-	    // the function is defined below
-	    FitFunc func = new FitFunc( "f1", -30., 330. );
-	    func.setParameter(0,28.0);
-	    func.setParameter(1,2.0);
-	    func.setParameter(2, 0.);
-	    func.setLineWidth(3);
-	    DataFitter.fit( func, g_results,"Q");
-	    func.setLineColor(2);
-	    func.setOptStat(11110);
-	    func.show();
-
-	    // store the fit function
-	    a_fits.add( func );
-	  }
-
-	  // useful functions
-	  // ---------------- 
   private void fitPol0( GraphErrors g ){
     double y = 0.;
     double ey = 0.;
