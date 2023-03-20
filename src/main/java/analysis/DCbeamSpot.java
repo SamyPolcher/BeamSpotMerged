@@ -322,6 +322,8 @@ public class DCbeamSpot {
       // skip if chi-square bad:
       if (func.getChiSquare()/func.getNDF() < 0.05) continue;
       if (func.getChiSquare()/func.getNDF() > 10) continue;
+      
+      System.out.println( "x: "+h2_z_phi.getYAxis().getBinCenter( i ) + " y: "+ func.getParameter(1));
 
       // store the fir result in the corresponding graph
       g_results.addPoint( 
