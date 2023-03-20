@@ -182,7 +182,7 @@ public class DCbeamSpot {
       // fill the histograms
       h1_z.fill( part.getVz() );
       h1_phi.fill( part.getPhi() );
-      System.out.println( "Vz: "+part.getVz() + " Phi: "+ part.getPhi());
+      //System.out.println( "Vz: "+part.getVz() + " Phi: "+ part.getPhi());
       a_h2_z_phi.get(bin).fill( part.getVz(), part.getPhi() );
     } // end loop over tracks
     return true;
