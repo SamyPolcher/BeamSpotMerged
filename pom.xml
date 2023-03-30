@@ -40,7 +40,7 @@
 	                <configuration>
 						<archive>
                         	<manifest>
-                            	<mainClass>analysis.DCbeamSpot</mainClass>
+                            	<mainClass>analysis.BeamSpot</mainClass>
                         	</manifest>
                     	</archive>
 	                    <descriptorRefs>
