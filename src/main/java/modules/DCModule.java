@@ -267,7 +267,7 @@ public class DCModule  extends Module {
     // analysis of one theta bin
     // ------------------------------------
 
-    public void analyze( int i_theta_bin, F1D fitFunc ) {
+    public void analyzeHistos( int i_theta_bin, F1D fitFunc ) {
 
       GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i_theta_bin);
       H2F h2_z_phi = this.getHistos().get("z_phi").getH2F("z_phi_"+i_theta_bin);
@@ -345,7 +345,7 @@ public class DCModule  extends Module {
       
       H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+0);
       if(htest.getFunction() == null) System.out.println("htest its empty " + i_theta_bin + 0);
-      System.out.println("htest its empty " + i_theta_bin + 0);
+//      System.out.println("htest its empty " + i_theta_bin + 0);
       
       if(g_peak.getFunction() == null) System.out.println("g_peak its empty " + i_theta_bin);
     }
