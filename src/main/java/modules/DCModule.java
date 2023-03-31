@@ -211,7 +211,7 @@ public class DCModule  extends Module {
 
     // analysis
     // ------------------------------------
-    public void analyze() {
+    public void analyzeHistos() {
         
       GraphErrors gZ = this.getHistos().get("fit_result").getGraph("gZ");
       GraphErrors gR = this.getHistos().get("fit_result").getGraph("gR");
@@ -267,7 +267,7 @@ public class DCModule  extends Module {
     // analysis of one theta bin
     // ------------------------------------
 
-    public void analyzeHistos( int i_theta_bin, F1D fitFunc ) {
+    public void analyze( int i_theta_bin, F1D fitFunc ) {
 
       GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i_theta_bin);
       H2F h2_z_phi = this.getHistos().get("z_phi").getH2F("z_phi_"+i_theta_bin);
