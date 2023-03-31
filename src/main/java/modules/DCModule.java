@@ -314,7 +314,7 @@ public class DCModule  extends Module {
 
         // the fit function of the target window peak, a gaussian for simplicity
         // the fit range is +- RMS around the peak
-        F1D func = new F1D( "func"+i, "[amp]*gaus(x,[mean],[sigma]) + [c] + [d]*x", rmin, rmax ); 
+        F1D func = new F1D( "func_"+i_theta_bin+"_"+i, "[amp]*gaus(x,[mean],[sigma]) + [c] + [d]*x", rmin, rmax ); 
         func.setParameter(0, h.getBinContent( h.getMaximumBin() ) );
         func.setParameter(1, h.getAxis().getBinCenter( h.getMaximumBin() )  ); 
         func.setParameter(2, rms/2. );
@@ -360,7 +360,7 @@ public class DCModule  extends Module {
       f.show();
       
       H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+0);
-      if(htest.getFunction() == null) System.out.println("htest its empty " + i_theta_bin + 0);
+      if(htest.getFunction() == null) System.out.println("htest fit is empty " + i_theta_bin + 0);
       // System.out.println("htest its empty " + i_theta_bin + 0);
       
       if(g_peak.getFunction() == null) System.out.println("g_peak its empty in scope " + i_theta_bin);
