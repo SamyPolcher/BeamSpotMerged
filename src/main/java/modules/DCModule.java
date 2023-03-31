@@ -191,6 +191,8 @@ public class DCModule  extends Module {
 
           if(checkTrack(track)) {
               
+              H1F h = this.getHistos().get("distribution").getH1F("vz");
+              
               // compute phi and theta
               float phi = (float) Math.toDegrees( Math.atan2( track.py(), track.px()) );
               if( phi < 0 ) phi += 360.0;  // transform the phi interval from [-180,180) to [0,360)
@@ -204,7 +206,8 @@ public class DCModule  extends Module {
               if( bin < 0 || bin >= theta_bins.length - 1 ) continue;
               
               // fill histograms
-              this.getHistos().get("distribution").getH1F("vz").fill(track.vz());
+//              this.getHistos().get("distribution").getH1F("vz").fill(track.vz());
+              h.fill(track.vz());
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
               this.getHistos().get("z_phi").getH2F("z_phi_"+bin).fill(track.vz(), phi);
           }
