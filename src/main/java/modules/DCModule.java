@@ -114,7 +114,7 @@ public class DCModule  extends Module {
           g.setTitleY("Z vertex (cm)");
           dg_peak.addDataSet(g, i);
           
-          F1D f = new F1D( "fit_"+i, "[z0] - [A] * cos( x * pi/180.0 - [phi0] )", -30, 330 );
+          F1D f = new F1D( "fit_"+i, "[z0] - [A] * cos( x * #pi/180.0 - [phi0] )", -30, 330 );
           f.setParameter(0,28.0);
           f.setParameter(1,2.0);
           f.setParameter(2, 0.);
