@@ -173,7 +173,7 @@ public class DCModule  extends Module {
     public boolean checkTrack(Track trk) {
 //        if(trk.getDetector()!=2 || trk.charge()>=0) return false;
         // if(trk.getNDF()<1 || trk.getChi2()/trk.getNDF()>30 || trk.pt()<0.2) return false;
-        if(trk.getId()!=11 || trk.p()<1.5) return false;
+//        if(trk.getId()!=11 || trk.p()<1.5) return false;
         return true;
     }
     
@@ -205,7 +205,7 @@ public class DCModule  extends Module {
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
               this.getHistos().get("z_phi").getH2F("z_phi_"+bin).fill(track.vz(), phi);
               
-//              System.out.println("cc");
+              System.out.println("cc");
           }
       }
     }
