@@ -341,8 +341,10 @@ public class DCModule  extends Module {
       }
 
       // extract the modulation of the target z position versus phi by fitting the graph, the function is defined in createHistos()
-      DataFitter.fit( fitFunc, g_peak,"Q");
+      DataFitter.fit( fitFunc, g_peak, "Q");
       fitFunc.show();
+      
+      if(g_peak.getFunction() == null) System.out.println("g_peak its empty " + i);
     }
 
     // useful functions
