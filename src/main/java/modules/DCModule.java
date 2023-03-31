@@ -349,7 +349,13 @@ public class DCModule  extends Module {
       }
 
       // extract the modulation of the target z position versus phi by fitting the graph, the function is defined in createHistos()
-      F1D f = this.getHistos().get("fit").getF1D("fit_"+i_theta_bin);
+      F1D f = new F1D( "fit_"+i, "[z0] - [A] * cos( x * 3.1415 / 180.0 - [phi0] )", -30, 330 );
+      f.setParameter(0,28.0);
+      f.setParameter(1,2.0);
+      f.setParameter(2, 0.);
+      f.setLineWidth(3);
+      f.setLineColor(2);
+      f.setOptStat(11110);
       DataFitter.fit( f, g_peak, "Q");
       f.show();
       
