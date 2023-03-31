@@ -45,7 +45,7 @@ public class DCModule  extends Module {
     // 
     // ----------------------------------------- 
     public DCModule() {
-      super("DCVertex_");
+      super("DCVertex");
       this.outputPrefix = "DCVertex";
       check_slices = true;
       isInit = false;

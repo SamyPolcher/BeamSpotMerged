@@ -49,7 +49,7 @@ public class Module {
         
     public Module(String name){                               
         this.moduleName = name;
-        this.init();
+//        this.init();
     }
     
     // ----------- Methods that should be overridden in the module's extensions to be used -----------
