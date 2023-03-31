@@ -188,7 +188,7 @@ public class DCModule  extends Module {
 //      if( bpart == null || btrk == null) return;
       
       for(Track track : event.getTracks()) {
-          System.out.println(track.getId());
+//          System.out.println(track.getId());
           if(checkTrack(track)) {
               
               // compute phi and theta
