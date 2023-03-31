@@ -345,6 +345,7 @@ public class DCModule  extends Module {
       
       H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+0);
       if(htest.getFunction() == null) System.out.println("htest its empty " + i_theta_bin + 0);
+      System.out.println("htest its empty " + i_theta_bin + 0);
       
       if(g_peak.getFunction() == null) System.out.println("g_peak its empty " + i_theta_bin);
     }
