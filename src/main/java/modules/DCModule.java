@@ -103,6 +103,7 @@ public class DCModule  extends Module {
       
       
       for( int i = 0; i<theta_bins.length-1; i++ ){
+          System.out.println("createHistos " + i);
           H2F h2 = histo2D("z_phi_"+i, "Z vertex (cm)", "#phi (degrees)", 100, zmin, zmax, NphiBin, -30, 330); 
           h2.setTitle("#theta = "+(theta_bins[i]+theta_bins[i+1])/2);
           dg_z_phi.addDataSet(h2, i);
@@ -127,13 +128,13 @@ public class DCModule  extends Module {
               dg_z_slice.addDataSet(h1, NphiBin*i+j);
           }   
       }
-    
+      
+      this.getHistos().put("distribution",  dg_distrib);
       this.getHistos().put("z_phi", dg_z_phi);
       this.getHistos().put("peak_position", dg_peak);
       this.getHistos().put("fit",  dg_fits);
       this.getHistos().put("fit_result",  dg_fit_results);
       this.getHistos().put("z_slice",  dg_z_slice);
-      this.getHistos().put("distribution",  dg_distrib);
 }
 
     // setters
