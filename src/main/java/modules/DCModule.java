@@ -317,7 +317,7 @@ public class DCModule  extends Module {
         func.setParameter(4, .01 );
         func.setOptStat(110);
         DataFitter.fit( func, h, "Q" );
-        func.show();
+        
         // skip if Gaussian amplitude too small:
         if (func.getParameter(0) < 8) continue;
 
@@ -337,6 +337,9 @@ public class DCModule  extends Module {
             func.getParameter(1),
             0,
             func.parameter(1).error() );
+        
+        H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+i);
+        if(htest.getFunction() == null) System.out.println("htest its empty " + i_theta_bin + j);
 
       }
 
