@@ -174,8 +174,8 @@ public class DCModule  extends Module {
         if(trk.getDetector()!=2 || trk.charge()>=0) return false;
         // if(trk.getNDF()<1 || trk.getChi2()/trk.getNDF()>30 || trk.pt()<0.2) return false;
 //        if(trk.getId()!=11 || trk.p()<1.5) return false;
-//        if(trk.getId()!=11) return false;
-        if(trk.p()<1.5) return false;
+        if(trk.getId()!=11) return false;
+//        if(trk.p()<1.5) return false;
         return true;
     }
     
