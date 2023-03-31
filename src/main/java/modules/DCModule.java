@@ -174,8 +174,6 @@ public class DCModule  extends Module {
         if(trk.getDetector()!=2 || trk.charge()>=0) return false;
         // if(trk.getNDF()<1 || trk.getChi2()/trk.getNDF()>30 || trk.pt()<0.2) return false;
         if(trk.pid()!=11 || trk.p()<1.5) return false;
-//        if(trk.getId()!=11) return false;
-//        if(trk.p()<1.5) return false;
         return true;
     }
     
@@ -191,8 +189,6 @@ public class DCModule  extends Module {
 
           if(checkTrack(track)) {
               
-              H1F h = this.getHistos().get("distribution").getH1F("vz");
-              
               // compute phi and theta
               float phi = (float) Math.toDegrees( Math.atan2( track.py(), track.px()) );
               if( phi < 0 ) phi += 360.0;  // transform the phi interval from [-180,180) to [0,360)
@@ -206,8 +202,7 @@ public class DCModule  extends Module {
               if( bin < 0 || bin >= theta_bins.length - 1 ) continue;
               
               // fill histograms
-//              this.getHistos().get("distribution").getH1F("vz").fill(track.vz());
-              h.fill(track.vz());
+              this.getHistos().get("distribution").getH1F("vz").fill(track.vz());
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
               this.getHistos().get("z_phi").getH2F("z_phi_"+bin).fill(track.vz(), phi);
           }
@@ -219,9 +214,6 @@ public class DCModule  extends Module {
     // ------------------------------------
     public void analyzeHistos() {
         
-        H1F h = this.getHistos().get("distribution").getH1F("vz");
-        System.out.println("hvz number of entries in analyse histos: " + h.getEntries());
-        
       GraphErrors gZ = this.getHistos().get("fit_result").getGraph("gZ");
       GraphErrors gR = this.getHistos().get("fit_result").getGraph("gR");
       GraphErrors gP = this.getHistos().get("fit_result").getGraph("gP");
@@ -230,9 +222,13 @@ public class DCModule  extends Module {
 
       // loop over theta bins
       for( int i=0; i<theta_bins.length-1; i++ ){
-        
-          F1D f = this.getHistos().get("fit").getF1D("fit_"+i);
-          analyze( i, f );
+          
+          GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i);
+          F1D f1 = this.getHistos().get("fit").getF1D("fit_"+i);
+          analyze( i, f1 );
+          
+          Func1D f = g_peak.getFunction();
+          if(f == null) System.out.println("g_peak fit is empty " + i);
           
           double theta = (theta_bins[i] + theta_bins[i+1])/2.;
           double Etheta = 0.0;
@@ -276,7 +272,7 @@ public class DCModule  extends Module {
     // analysis of one theta bin
     // ------------------------------------
 
-    public void analyze( int i_theta_bin, F1D fitFunc ) {
+    public void analyze( int i_theta_bin, F1D fitFunctest ) {
 
       GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i_theta_bin);
       H2F h2_z_phi = this.getHistos().get("z_phi").getH2F("z_phi_"+i_theta_bin);
@@ -353,14 +349,15 @@ public class DCModule  extends Module {
       }
 
       // extract the modulation of the target z position versus phi by fitting the graph, the function is defined in createHistos()
-      DataFitter.fit( fitFunc, g_peak, "Q");
-      fitFunc.show();
+      F1D f = this.getHistos().get("fit").getF1D("fit_"+i_theta_bin);
+      DataFitter.fit( f, g_peak, "Q");
+      f.show();
       
       H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+0);
       if(htest.getFunction() == null) System.out.println("htest its empty " + i_theta_bin + 0);
       // System.out.println("htest its empty " + i_theta_bin + 0);
       
-      if(g_peak.getFunction() == null) System.out.println("g_peak its empty " + i_theta_bin);
+      if(g_peak.getFunction() == null) System.out.println("g_peak its empty in scope " + i_theta_bin);
     }
 
     // useful functions
