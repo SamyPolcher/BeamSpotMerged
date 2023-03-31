@@ -95,7 +95,7 @@ public class Event {
                 Track track = Track.readParticle(recPart, recTrack, i);
                 if(runConfig!=null) track.addScale(runConfig);
                 tracks.add(track);
-                System.out.println(recPart.getInt("pid", row));
+                System.out.println("pid: "+recPart.getInt("pid", row));
             }            
             if(urecTrack!=null) {
                 for (int i = 0; i < recPart.rows(); i++) {    
