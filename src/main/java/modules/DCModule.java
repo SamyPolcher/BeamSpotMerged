@@ -317,6 +317,7 @@ public class DCModule  extends Module {
         func.setParameter(4, .01 );
         func.setOptStat(110);
         DataFitter.fit( func, h, "Q" );
+        h.setFunction(func);
         
         // skip if Gaussian amplitude too small:
         if (func.getParameter(0) < 8) continue;
