@@ -433,6 +433,7 @@ public class DCModule  extends Module {
           H1F h = this.getHistos().get("z_slice").getH1F("slice_"+i+"_"+j);
           ci.cd(j).setAxisTitleSize(18);
           Func1D func = h.getFunction();
+          if(func == null) System.out.println("its empty " + i);
           func.setLineColor( 2 );
           func.setLineWidth( 2 );
           func.setOptStat(1110);
