@@ -338,6 +338,9 @@ public class DCModule  extends Module {
             func.getParameter(1),
             0,
             func.parameter(1).error() );
+        
+        H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+j);
+        if(htest.getFunction() == null) System.out.println("htest its empty " + i_theta_bin + j);
       }
 
       // extract the modulation of the target z position versus phi by fitting the graph, the function is defined in createHistos()
