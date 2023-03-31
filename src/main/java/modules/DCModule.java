@@ -344,7 +344,7 @@ public class DCModule  extends Module {
       DataFitter.fit( fitFunc, g_peak, "Q");
       fitFunc.show();
       
-      if(g_peak.getFunction() == null) System.out.println("g_peak its empty " + i);
+      if(g_peak.getFunction() == null) System.out.println("g_peak its empty " + i_theta_bin);
     }
 
     // useful functions
