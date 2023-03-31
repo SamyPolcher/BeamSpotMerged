@@ -206,8 +206,6 @@ public class DCModule  extends Module {
               this.getHistos().get("z_phi").getH2F("z_phi_"+bin).fill(track.vz(), phi);
           }
       }
-      H1F h = this.getHistos().get("distribution").getH1F("vz");
-      System.out.println("hvz number of entries in fill histos" + h.getEntries());
     }
 
 
