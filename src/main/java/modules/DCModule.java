@@ -206,12 +206,17 @@ public class DCModule  extends Module {
               this.getHistos().get("z_phi").getH2F("z_phi_"+bin).fill(track.vz(), phi);
           }
       }
+      H1F h = this.getHistos().get("distribution").getH1F("vz");
+      System.out.println("hvz number of entries in fill histos" + h.getEntries());
     }
 
 
     // analysis
     // ------------------------------------
     public void analyzeHistos() {
+        
+        H1F h = this.getHistos().get("distribution").getH1F("vz");
+        System.out.println("hvz number of entries in analyse histos" + h.getEntries());
         
       GraphErrors gZ = this.getHistos().get("fit_result").getGraph("gZ");
       GraphErrors gR = this.getHistos().get("fit_result").getGraph("gR");
@@ -340,7 +345,7 @@ public class DCModule  extends Module {
             func.parameter(1).error() );
         
         H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+i);
-        if(htest.getFunction() == null) System.out.println("htest its empty " + i_theta_bin + i);
+        if(htest.getFunction() == null) System.out.println("htest its empty function in scope " + i_theta_bin + i);
       }
 
       // extract the modulation of the target z position versus phi by fitting the graph, the function is defined in createHistos()
@@ -349,7 +354,7 @@ public class DCModule  extends Module {
       
       H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+0);
       if(htest.getFunction() == null) System.out.println("htest its empty " + i_theta_bin + 0);
-//      System.out.println("htest its empty " + i_theta_bin + 0);
+      // System.out.println("htest its empty " + i_theta_bin + 0);
       
       if(g_peak.getFunction() == null) System.out.println("g_peak its empty " + i_theta_bin);
     }
