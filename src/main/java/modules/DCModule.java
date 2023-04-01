@@ -280,7 +280,7 @@ public class DCModule  extends Module {
         for (int y = 0; y < h2_z_phi.getXAxis().getNBins(); y++) {
             h.setBinContent(y, h2_z_phi.getBinContent(y, i));
         }
-        System.out.println("htest inside number of entries " + h.Entries());
+        System.out.println("htest inside number of entries " + h.getEntries());
 
         if( h.integral() < 10 ) continue;  // to skip empty bins
 
@@ -351,7 +351,7 @@ public class DCModule  extends Module {
       
       H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+0);
       if(htest.getFunction() == null) System.out.println("htest fit is empty " + i_theta_bin + 0);
-      System.out.println("htest outside number of entries " + htest.Entries());
+      System.out.println("htest outside number of entries " + htest.getEntries());
       // System.out.println("htest its empty " + i_theta_bin + 0);
       
       if(g_peak.getFunction() == null) System.out.println("g_peak its empty in scope " + i_theta_bin);
