@@ -13,6 +13,7 @@ import org.jlab.io.base.DataBank;
 import org.jlab.groot.data.GraphErrors;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F;
+import org.jlab.groot.math.Axis;
 import org.jlab.groot.fitter.DataFitter;
 import org.jlab.groot.fitter.ParallelSliceFitter;
 import org.jlab.groot.graphics.EmbeddedCanvas;
@@ -131,8 +132,9 @@ public class DCModule  extends Module {
       
       for( int i = 0; i<theta_bins.length-1; i++ ){
           
-          H2F h2 = histo2D("z_phi_"+i, "Z vertex (cm)", "#phi (degrees)", z_bins, phi_bins); 
-          h2.setTitle("#theta = "+(theta_bins[i]+theta_bins[i+1])/2);
+          H2F h2 = new H2F("z_phi_"+i, "#theta = "+(theta_bins[i]+theta_bins[i+1])/2, z_bins, phi_bins); 
+          h2.setTitleX("Z vertex (cm)");
+          h2.setTitleY("#phi (degrees)");
           dg_z_phi.addDataSet(h2, i);
           
           GraphErrors g = new GraphErrors("g_"+i);
