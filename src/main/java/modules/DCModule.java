@@ -127,7 +127,7 @@ public class DCModule  extends Module {
       Axis zAxis = new Axis(100, zmin, zmax);
       
       phi_bins = phiAxis.getLimits();
-      z_bins = phiAxis.getLimits();
+      z_bins = zAxis.getLimits();
       
       for( int i = 0; i<theta_bins.length-1; i++ ){
           
