@@ -259,10 +259,9 @@ public class DCModule  extends Module {
     // analysis of one theta bin
     // ------------------------------------
 
-    public void analyze( int i_theta_bin) {
+    public void analyze( int thetaBin) {
 
-      GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i_theta_bin);
-      H2F h2_z_phi = this.getHistos().get("z_phi").getH2F("z_phi_"+i_theta_bin);
+      GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+thetaBin);
 
       // loop over the phi bins of the 2D histogram phi vs z
       // and fit with a gaussian around the target window position
@@ -272,15 +271,9 @@ public class DCModule  extends Module {
       final double xmax = targetZ + 6.;
 
       // loop  over the phi bins
-      for( int i=0; i<h2_z_phi.getYAxis().getNBins(); i++ ){
+      for( int i=0; i<phi_bins.length - 1; i++ ){
 
-        // fill the z slice for a given phi and theta bin
-        H1F h = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+i);
-//        for (int y = 0; y < h2_z_phi.getXAxis().getNBins(); y++) {
-//            h.setBinContent(y, h2_z_phi.getBinContent(y, i));
-//            System.out.println("htest bin content s " + h.getBinContent(y));
-//        }
-        System.out.println("htest inside number of entries " + h.getEntries());
+        H1F h = this.getHistos().get("z_slice").getH1F("slice_"+thetaBin+"_"+i);
 
         if( h.integral() < 10 ) continue;  // to skip empty bins
 
@@ -303,7 +296,7 @@ public class DCModule  extends Module {
 
         // the fit function of the target window peak, a gaussian for simplicity
         // the fit range is +- RMS around the peak
-        F1D func = new F1D( "func_"+i_theta_bin+"_"+i, "[amp]*gaus(x,[mean],[sigma]) + [c] + [d]*x", rmin, rmax ); 
+        F1D func = new F1D( "func_"+thetaBin+"_"+i, "[amp]*gaus(x,[mean],[sigma]) + [c] + [d]*x", rmin, rmax ); 
         func.setParameter(0, h.getBinContent( h.getMaximumBin() ) );
         func.setParameter(1, h.getAxis().getBinCenter( h.getMaximumBin() )  ); 
         func.setParameter(2, rms/2. );
@@ -311,7 +304,6 @@ public class DCModule  extends Module {
         func.setParameter(4, .01 );
         func.setOptStat(110);
         DataFitter.fit( func, h, "Q" );
-        h.setFunction(func);
         
         // skip if Gaussian amplitude too small:
         if (func.getParameter(0) < 8) continue;
@@ -333,12 +325,12 @@ public class DCModule  extends Module {
             0,
             func.parameter(1).error() );
         
-        H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+i);
-        if(htest.getFunction() == null) System.out.println("htest its empty function in scope " + i_theta_bin + i);
+        H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+thetaBin+"_"+i);
+        if(htest.getFunction() == null) System.out.println("htest its empty function in scope " + thetaBin + i);
       }
 
       // extract the modulation of the target z position versus phi by fitting the graph, the function is defined in createHistos()
-      F1D f = new F1D( "fit_"+i_theta_bin, "[z0] - [A] * cos( x * 3.1415 / 180.0 - [phi0] )", -30, 330 );
+      F1D f = new F1D( "fit_"+thetaBin, "[z0] - [A] * cos( x * 3.1415 / 180.0 - [phi0] )", -30, 330 );
       f.setParameter(0,28.0);
       f.setParameter(1,2.0);
       f.setParameter(2, 0.);
@@ -348,13 +340,6 @@ public class DCModule  extends Module {
 
       DataFitter.fit( f, g_peak, "Q");
       f.show();
-      
-      H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+0);
-      if(htest.getFunction() == null) System.out.println("htest fit is empty " + i_theta_bin + 0);
-//      System.out.println("htest outside number of entries " + htest.getEntries());
-      // System.out.println("htest its empty " + i_theta_bin + 0);
-      
-      if(g_peak.getFunction() == null) System.out.println("g_peak its empty in scope " + i_theta_bin);
     }
 
     // useful functions
@@ -445,10 +430,11 @@ public class DCModule  extends Module {
           H1F h = this.getHistos().get("z_slice").getH1F("slice_"+i+"_"+j);
           ci.cd(j).setAxisTitleSize(18);
           Func1D func = h.getFunction();
-          if(func == null) System.out.println("its empty " + i);
-          func.setLineColor( 2 );
-          func.setLineWidth( 2 );
-          func.setOptStat(1110);
+          if(func != null) {
+              func.setLineColor( 2 );
+              func.setLineWidth( 2 );
+              func.setOptStat(1110);
+          }else System.out.println("fit for z slice " + i + " is empty");
           ci.setAxisLabelSize(8);
           ci.setAxisLabelSize(8);
           ci.setAxisTitleSize(8);
