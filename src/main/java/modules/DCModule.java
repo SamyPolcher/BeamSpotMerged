@@ -63,7 +63,6 @@ public class DCModule  extends Module {
       // containers for theta bins
       DataGroup dg_z_phi = new DataGroup(1, theta_bins.length-1);    // phi vs z at vertex
       DataGroup dg_peak = new DataGroup(1, theta_bins.length-1);     // mean position of the target window versus phi
-      DataGroup dg_fits = new DataGroup(1, theta_bins.length-1);     // fit functions of the target window position modulation in phi
       
       // containers for z slice fits
       DataGroup dg_z_slice = new DataGroup(NphiBin, theta_bins.length-1);
@@ -114,15 +113,6 @@ public class DCModule  extends Module {
           g.setTitleY("Z vertex (cm)");
           dg_peak.addDataSet(g, i);
           
-          F1D f = new F1D( "fit_"+i, "[z0] - [A] * cos( x * 3.1415 / 180.0 - [phi0] )", -30, 330 );
-          f.setParameter(0,28.0);
-          f.setParameter(1,2.0);
-          f.setParameter(2, 0.);
-          f.setLineWidth(3);
-          f.setLineColor(2);
-          f.setOptStat(11110);
-          dg_fits.addDataSet(f, i);
-          
           for(int j=0; j<NphiBin; j++) {
               H1F h1 = new H1F("slice_"+i+"_"+j, "", NphiBin, -30, 330);
               dg_z_slice.addDataSet(h1, NphiBin*i+j);
@@ -132,7 +122,6 @@ public class DCModule  extends Module {
       this.getHistos().put("distribution",  dg_distrib);
       this.getHistos().put("z_phi", dg_z_phi);
       this.getHistos().put("peak_position", dg_peak);
-      this.getHistos().put("fit",  dg_fits);
       this.getHistos().put("fit_result",  dg_fit_results);
       this.getHistos().put("z_slice",  dg_z_slice);
 }
@@ -224,7 +213,6 @@ public class DCModule  extends Module {
       for( int i=0; i<theta_bins.length-1; i++ ){
           
           GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i);
-//          F1D f1 = this.getHistos().get("fit").getF1D("fit_"+i);
           analyze( i );
           
           Func1D f = g_peak.getFunction();
@@ -349,13 +337,14 @@ public class DCModule  extends Module {
       }
 
       // extract the modulation of the target z position versus phi by fitting the graph, the function is defined in createHistos()
-      F1D f = new F1D( "fit_"+i_theta_bin, "[z0] - [A] * cos( x * 3.1415 / 180.0 - [phi0] )", -30, 330 );
+      F1D f = new F1D( "fit_"+i, "[z0] - [A] * cos( x * 3.1415 / 180.0 - [phi0] )", -30, 330 );
       f.setParameter(0,28.0);
       f.setParameter(1,2.0);
       f.setParameter(2, 0.);
       f.setLineWidth(3);
       f.setLineColor(2);
       f.setOptStat(11110);
+
       DataFitter.fit( f, g_peak, "Q");
       f.show();
       
