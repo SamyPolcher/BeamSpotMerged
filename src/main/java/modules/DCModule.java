@@ -274,6 +274,7 @@ public class DCModule  extends Module {
       for( int i=0; i<phi_bins.length - 1; i++ ){
 
         H1F h = this.getHistos().get("z_slice").getH1F("slice_"+thetaBin+"_"+i);
+        H2F h2_z_phi = this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin);
 
         if( h.integral() < 10 ) continue;  // to skip empty bins
 
@@ -320,13 +321,8 @@ public class DCModule  extends Module {
 
         // store the fit result in the corresponding graph
         g_peak.addPoint( 
-            h2_z_phi.getYAxis().getBinCenter( i ),
-            func.getParameter(1),
-            0,
-            func.parameter(1).error() );
-        
-        H1F htest = this.getHistos().get("z_slice").getH1F("slice_"+thetaBin+"_"+i);
-        if(htest.getFunction() == null) System.out.println("htest its empty function in scope " + thetaBin + i);
+            h2_z_phi.getYAxis().getBinCenter( i ), func.getParameter(1),
+            0, func.parameter(1).error() );
       }
 
       // extract the modulation of the target z position versus phi by fitting the graph, the function is defined in createHistos()
