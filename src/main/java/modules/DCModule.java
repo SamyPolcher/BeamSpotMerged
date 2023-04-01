@@ -436,20 +436,15 @@ public class DCModule  extends Module {
           ci.setAxisTitleSize(8);
           ci.setAxisTitleSize(8);
           ci.draw( h );
-          //F1D fg = new F1D( "fg"+h.getName(), "[amp]*gaus(x,[mean],[sigma])", func.getMin(), func.getMax() );
-          //fg.setParameter(0, func.getParameter(0) );
-          //fg.setParameter(1, func.getParameter(1) );
-          //fg.setParameter(2, func.getParameter(2) );
-          //fg.setLineColor(4);
-          //ci.draw(fg,"same");
-          F1D fb = new F1D( "fb"+h.getName(), "[c]+[d]*x", func.getMin(), func.getMax() );
-          fb.setParameter(0, func.getParameter(3) );
-          fb.setParameter(1, func.getParameter(4) );
-          fb.setLineColor(5);
-          fb.setLineWidth(2);
-          ci.draw(fb,"same");
-          // can't do this because it adds to the legend ...
-          //ci.draw(func,"same");
+          
+          if(func != null) {
+              F1D fb = new F1D( "fb"+h.getName(), "[c]+[d]*x", func.getMin(), func.getMax() );
+              fb.setParameter(0, func.getParameter(3) );
+              fb.setParameter(1, func.getParameter(4) );
+              fb.setLineColor(5);
+              fb.setLineWidth(2);
+              ci.draw(fb,"same");
+          }
         }
       }
 
