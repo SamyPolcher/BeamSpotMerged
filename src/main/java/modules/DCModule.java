@@ -149,8 +149,6 @@ public class DCModule  extends Module {
           }   
       }
       
-      phi_bins = 
-      
       this.getHistos().put("distribution",  dg_distrib);
       this.getHistos().put("z_phi", dg_z_phi);
       this.getHistos().put("peak_position", dg_peak);
@@ -455,7 +453,7 @@ public class DCModule  extends Module {
         EmbeddedCanvas ci = czfits.getCanvas( cname );
         ci.divide(7,8);
         
-        for( int j=0; j<NphiBin; j++ ){
+        for( int j=0; j<phi_bins.length-1; j++ ){
           H1F h = this.getHistos().get("z_slice").getH1F("slice_"+i+"_"+j);
           ci.cd(j).setAxisTitleSize(18);
           Func1D func = h.getFunction();
