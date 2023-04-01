@@ -28,19 +28,19 @@ import objects.Track;
 import objects.Event;
 
 public class DCModule  extends Module {
-    
+   
+    // Attributes
+    // -----------------------------------------
     String outputPrefix = "DCbeamSpot";
-
+    int binsPerSector = 10;
     float fitRangeScale = 1.0f;
     float targetZ = 25.4f;
-    int binsPerSector = 10;
-    int NphiBin = binsPerSector * 6;
-    boolean isInit;
-
-    // settings
-    // -----------------------------------------
     boolean check_slices;
+    
+    // bins used for the beamspot analysis
     double[] theta_bins;
+    double[] phi_bins;
+    double[] z_bins;
 
     // 
     // ----------------------------------------- 
@@ -48,9 +48,31 @@ public class DCModule  extends Module {
       super("DCVertex");
       this.outputPrefix = "DCVertex";
       check_slices = true;
-      isInit = false;
     }
+    
 
+    // setters
+    // -----------------------------------------
+    public void setCheckSlices( boolean t ) { check_slices = t; }
+
+    public void setThetaBins( double[] bins ) { theta_bins = bins; }
+
+    public void setFitRangeScale( float s ) { fitRangeScale = s; }
+
+    public void setTargetZ( float z ) { targetZ = z; }
+
+    public void setBinsPerSector( int n ) { binsPerSector = n; }
+        
+    
+    // getters
+    // -----------------------------------------
+    public double[] getThetaBins() { return theta_bins; }
+    
+    public int getBinsPerSector() { return binsPerSector;}
+
+    public String getOutputPrefix() { return outputPrefix; }
+    
+    
     // initialize histograms, graphs and fit functions
     // -----------------------------------------
     @Override
@@ -58,7 +80,7 @@ public class DCModule  extends Module {
         
       final float zmin = (int)(targetZ - 4.4);
       final float zmax = (int)(targetZ + 15.6);
-      NphiBin = (int)(6*binsPerSector);
+      int NphiBin = (int)(6*binsPerSector);
       
       // containers for theta bins
       DataGroup dg_z_phi = new DataGroup(1, theta_bins.length-1);    // phi vs z at vertex
@@ -100,10 +122,16 @@ public class DCModule  extends Module {
       dg_fit_results.addDataSet(gX, 3);
       dg_fit_results.addDataSet(gY, 4);
       
+      Axis phiAxis = new Axis(NphiBin, -30, 330);
+      Axis zAxis = new Axis(100, zmin, zmax);
+      
+      phi_bins = phiAxis.getLimits();
+      z_bins = phiAxis.getLimits();
+      if(NphiBin==phi_bins.length-1) System.out.println(" Phi bin length check ");
       
       for( int i = 0; i<theta_bins.length-1; i++ ){
-          System.out.println("createHistos " + i);
-          H2F h2 = histo2D("z_phi_"+i, "Z vertex (cm)", "#phi (degrees)", 100, zmin, zmax, NphiBin, -30, 330); 
+          
+          H2F h2 = histo2D("z_phi_"+i, "Z vertex (cm)", "#phi (degrees)", z_bins, phi_bins); 
           h2.setTitle("#theta = "+(theta_bins[i]+theta_bins[i+1])/2);
           dg_z_phi.addDataSet(h2, i);
           
@@ -114,10 +142,12 @@ public class DCModule  extends Module {
           dg_peak.addDataSet(g, i);
           
           for(int j=0; j<NphiBin; j++) {
-              H1F h1 = new H1F("slice_"+i+"_"+j, "", NphiBin, -30, 330);
+              H1F h1 = new H1F("slice_"+i+"_"+j, "", z_bins);
               dg_z_slice.addDataSet(h1, NphiBin*i+j);
           }   
       }
+      
+      phi_bins = 
       
       this.getHistos().put("distribution",  dg_distrib);
       this.getHistos().put("z_phi", dg_z_phi);
@@ -126,26 +156,7 @@ public class DCModule  extends Module {
       this.getHistos().put("z_slice",  dg_z_slice);
 }
 
-    // setters
-    // -----------------------------------------
-    public void setCheckSlices( boolean t ) { check_slices = t; }
 
-    public void setThetaBins( double[] bins ) { theta_bins = bins; }
-
-    public void setFitRangeScale( float s ) { fitRangeScale = s; }
-
-    public void setTargetZ( float z ) { targetZ = z; }
-
-    public void setBinsPerSector( int n ) { binsPerSector = n; }
-        
-    
-    // getters
-    // -----------------------------------------
-    public double[] getThetaBins() { return theta_bins; }
-    
-    public int getBinsPerSector() { return binsPerSector;}
-
-    public String getOutputPrefix() { return outputPrefix; }
     
     /*
     public ArrayList<H2F> getA_h2_z_phi() { return a_h2_z_phi; }
