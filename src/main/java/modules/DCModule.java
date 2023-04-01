@@ -192,7 +192,7 @@ public class DCModule  extends Module {
               this.getHistos().get("distribution").getH1F("vz").fill(track.vz());
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
               this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(track.vz(), phi);
-              this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).Fill(track.vz());
+              this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(track.vz());
           }
       }
     }
