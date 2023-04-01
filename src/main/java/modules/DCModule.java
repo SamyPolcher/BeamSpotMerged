@@ -128,7 +128,6 @@ public class DCModule  extends Module {
       
       phi_bins = phiAxis.getLimits();
       z_bins = phiAxis.getLimits();
-      if(NphiBin==phi_bins.length-1) System.out.println(" Phi bin length check ");
       
       for( int i = 0; i<theta_bins.length-1; i++ ){
           
@@ -156,18 +155,6 @@ public class DCModule  extends Module {
       this.getHistos().put("z_slice",  dg_z_slice);
 }
 
-
-    
-    /*
-    public ArrayList<H2F> getA_h2_z_phi() { return a_h2_z_phi; }
-    
-    public GraphErrors getGZ() { return gZ;}
-    public GraphErrors getGR() { return gR;}
-    public GraphErrors getGP() { return gP;}
-    public GraphErrors getGX() { return gX;}
-    public GraphErrors getGY() { return gY;}
-    */
-
     
     @Override
     public boolean checkTrack(Track trk) {
@@ -177,13 +164,9 @@ public class DCModule  extends Module {
         return true;
     }
     
+    
     @Override
     public void fillHistos(Event event) {
-
-//      DataBank bpart = event.getBank( "REC::Particle" );
-//      DataBank btrk  = event.getBank( "REC::Track" );
-//
-//      if( bpart == null || btrk == null) return;
       
       for(Track track : event.getTracks()) {
 
@@ -197,14 +180,19 @@ public class DCModule  extends Module {
               float theta = (float) Math.toDegrees( Math.atan2( Math.sqrt( track.px()*track.px() + track.py()*track.py()), track.pz() ) );
               
               // find theta/phi bin
-              int bin = Arrays.binarySearch( theta_bins, theta );
-              bin = -bin -2;
-              if( bin < 0 || bin >= theta_bins.length - 1 ) continue;
+              int thetaBin = Arrays.binarySearch( theta_bins, theta );
+              thetaBin = -thetaBin -2;
+              if( thetaBin < 0 || thetaBin >= theta_bins.length - 1 ) continue;
+              
+              int phiBin = Arrays.binarySearch( phi_bins, phi );
+              phiBin = -phiBin -2;
+              if( phiBin < 0 || phiBin >= phi_bins.length - 1 ) continue;
               
               // fill histograms
               this.getHistos().get("distribution").getH1F("vz").fill(track.vz());
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
-              this.getHistos().get("z_phi").getH2F("z_phi_"+bin).fill(track.vz(), phi);
+              this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(track.vz(), phi);
+              this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).Fill(track.vz());
           }
       }
     }
@@ -288,11 +276,11 @@ public class DCModule  extends Module {
 
         // fill the z slice for a given phi and theta bin
         H1F h = this.getHistos().get("z_slice").getH1F("slice_"+i_theta_bin+"_"+i);
-        for (int y = 0; y < h2_z_phi.getXAxis().getNBins(); y++) {
-            h.setBinContent(y, h2_z_phi.getBinContent(y, i));
+//        for (int y = 0; y < h2_z_phi.getXAxis().getNBins(); y++) {
+//            h.setBinContent(y, h2_z_phi.getBinContent(y, i));
 //            System.out.println("htest bin content s " + h.getBinContent(y));
-        }
-//        System.out.println("htest inside number of entries " + h.getEntries());
+//        }
+        System.out.println("htest inside number of entries " + h.getEntries());
 
         if( h.integral() < 10 ) continue;  // to skip empty bins
 
