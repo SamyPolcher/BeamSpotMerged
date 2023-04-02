@@ -233,9 +233,10 @@ public class BeamSpot {
         }
 
         if(openWindow) {
-            JFrame frame = new JFrame("CVTMonitoring");
+            JFrame frame = new JFrame("Beam Spot");
             frame.setSize(1400, 900);
-            frame.add(bs.plotHistos());
+//            frame.add(bs.plotHistos());
+            frame.add(bs.modules[1].plot());
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
             if(printHistos) bs.printHistos();
