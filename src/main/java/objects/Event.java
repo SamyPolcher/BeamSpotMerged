@@ -1,6 +1,5 @@
 package objects;
 
-import analysis.Constants;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -24,15 +23,16 @@ public class Event {
     private double startTime;
 
     private final List<Track> particles  = new ArrayList<>();
-    private final List<Track> tracks     = new ArrayList<>();
-    private final List<Track> utracks     = new ArrayList<>();
+    private final List<Track> CDtracks     = new ArrayList<>();
+    private final List<Track> FDtracks     = new ArrayList<>();
+    private final List<Track> CDutracks     = new ArrayList<>();
   
     private DataEvent hipoEvent;
 
     public Event(DataEvent event) {
         this.hipoEvent = event;
         this.readEvent(event);
-        if(debug) System.out.println("Read event with " + tracks.size() + " particles");
+        if(debug) System.out.println("Read event with " + CDtracks.size() + " particles");
     }
     
 
@@ -84,25 +84,58 @@ public class Event {
         }
     }
     
-    private void readTracks(DataEvent event) {
+    private void readCDTracks(DataEvent event) {
+        DataBank cvtBank   = this.getBank(event, "CVTRec::Tracks");
+        DataBank ucvtBank  = this.getBank(event, "CVTRec::UTracks");
         DataBank recPart   = this.getBank(event, "REC::Particle");
         DataBank recTrack  = this.getBank(event, "REC::Track");
         DataBank urecTrack = this.getBank(event, "REC::UTrack");
         DataBank runConfig = this.getBank(event, "RUN::config");
-       
-          if(recPart!=null && recTrack!=null) {
+        if(cvtBank!=null) {
+            for(int i=0; i<cvtBank.rows(); i++) {
+                Track track = Track.readTrack(cvtBank, i);
+                if(runConfig!=null) track.addScale(runConfig);
+                CDtracks.add(track);
+            }
+            if(ucvtBank!=null) {
+                for(int i=0; i<ucvtBank.rows(); i++) {
+                    Track track = Track.readTrack(ucvtBank, i);
+                    if(runConfig!=null) track.addScale(runConfig);
+                    CDutracks.add(track);
+                }
+            }
+        }
+        else if(recPart!=null && recTrack!=null) {
             for (int i = 0; i < recPart.rows(); i++) {    
                 Track track = Track.readParticle(recPart, recTrack, i);
+                if(track.getDetector()!=4 || track.charge()==0) continue;
                 if(runConfig!=null) track.addScale(runConfig);
-                tracks.add(track);
+                CDtracks.add(track);
             }            
             if(urecTrack!=null) {
                 for (int i = 0; i < recPart.rows(); i++) {    
                     Track track = Track.readParticle(recPart, recTrack, urecTrack, i);
+                    if(track.getDetector()!=4 || track.charge()==0) continue;
                     if(runConfig!=null) track.addScale(runConfig);
-                    utracks.add(track);
+                    CDutracks.add(track);
                 }            
             }
+        }
+    }
+    
+    
+    private void readFDTracks(DataEvent event) {
+        DataBank recPart   = this.getBank(event, "REC::Particle");
+        DataBank recTrack  = this.getBank(event, "REC::Track");
+        DataBank runConfig = this.getBank(event, "RUN::config");
+       
+        if(recPart!=null && recTrack!=null) {
+            for (int i = 0; i < recPart.rows(); i++) {    
+                Track track = Track.readParticle(recPart, recTrack, i);
+                if(track.getDetector()!=2 || track.charge()==0) continue;
+                if(runConfig!=null) track.addScale(runConfig);
+                FDtracks.add(track);
+            }            
         }
     }
     
@@ -110,15 +143,20 @@ public class Event {
         this.readHeader(de);
         this.readParticles(de);
         this.readStartTime(de);
-        this.readTracks(de);
+        this.readCDTracks(de);
+        this.readFDTracks(de);
     }
 
-    public List<Track> getTracks() {
-        return tracks;
+    public List<Track> getCDTracks() {
+        return CDtracks;
     }
  
-    public List<Track> getUTracks() {
-        return utracks;
+    public List<Track> getCDUTracks() {
+        return CDutracks;
+    }
+    
+    public List<Track> getFDTracks() {
+        return FDtracks;
     }
  
    public List<Track> getParticles() {

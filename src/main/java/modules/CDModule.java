@@ -99,7 +99,6 @@ public class CDModule extends Module {
 
     @Override
     public boolean checkTrack(Track trk) {
-        if(trk.getDetector()!=4 || trk.charge()==0) return false;
         if(trk.getNDF()<1 || trk.getChi2()/trk.getNDF()>30 || trk.pt()<0.2) return false;
         return true;
     }
@@ -120,13 +119,13 @@ public class CDModule extends Module {
         List<Track> trackNeg = new ArrayList<>();
         List<Track> utrackPos = new ArrayList<>();
         List<Track> utrackNeg = new ArrayList<>();
-        for(Track track : event.getTracks()) {
+        for(Track track : event.getCDTracks()) {
             if(checkTrack(track)) {
                 if(track.charge()>0) trackPos.add(track);
                 else                 trackNeg.add(track);
             }
         }
-        for(Track track : event.getUTracks()) {
+        for(Track track : event.getCDUTracks()) {
             if(checkTrack(track)) {
                 if(track.charge()>0) utrackPos.add(track);
                 else                 utrackNeg.add(track);

@@ -515,7 +515,6 @@ public class Track extends Particle {
         if(pid==0) {
             pid = charge==0 ? 22 : charge*211;
         }
-        
         Track t = new Track(pid,
                     recPart.getFloat("px", row),
                     recPart.getFloat("py", row),

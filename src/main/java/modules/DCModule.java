@@ -36,7 +36,6 @@ public class DCModule  extends Module {
     int binsPerSector = 10;
     float fitRangeScale = 1.0f;
     float targetZ = 25.4f;
-    boolean check_slices;
     
     // bins used for the beamspot analysis
     double[] theta_bins;
@@ -48,13 +47,11 @@ public class DCModule  extends Module {
     public DCModule() {
       super("DCVertex");
       this.outputPrefix = "DCVertex";
-      check_slices = true;
     }
     
 
     // setters
     // -----------------------------------------
-    public void setCheckSlices( boolean t ) { check_slices = t; }
 
     public void setThetaBins( double[] bins ) { theta_bins = bins; }
 
@@ -158,7 +155,6 @@ public class DCModule  extends Module {
     
     @Override
     public boolean checkTrack(Track trk) {
-        if(trk.getDetector()!=2 || trk.charge()>=0) return false;
         // if(trk.getNDF()<1 || trk.getChi2()/trk.getNDF()>30 || trk.pt()<0.2) return false;
         if(trk.pid()!=11 || trk.p()<1.5) return false;
         return true;
@@ -168,7 +164,7 @@ public class DCModule  extends Module {
     @Override
     public void fillHistos(Event event) {
       
-      for(Track track : event.getTracks()) {
+      for(Track track : event.getFDTracks()) {
 
           if(checkTrack(track)) {
               
@@ -430,7 +426,7 @@ public class DCModule  extends Module {
               func.setLineColor( 2 );
               func.setLineWidth( 2 );
               func.setOptStat(1110);
-          }else System.out.println("fit for z slice " + i + " is empty");
+          }else System.out.println("fit for z slice " + i + ":" + j + " is empty");
           ci.setAxisLabelSize(8);
           ci.setAxisLabelSize(8);
           ci.setAxisTitleSize(8);
