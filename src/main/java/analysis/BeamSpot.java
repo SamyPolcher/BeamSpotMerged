@@ -62,13 +62,17 @@ public class BeamSpot {
         GStyle.setGraphicsFrameLineWidth(2);
         GStyle.getH1FAttributes().setLineWidth(1);
         
-        this.modules.add(new CDModule());
+        CDModule cd = new CDModule();
+        cd.init();
         
         DCModule dc = new DCModule();
         dc.setThetaBins(thetaBins);
         dc.setTargetZ(Ztarget);
         dc.setBinsPerSector(NphiBins);
         dc.setFitRangeScale(fitScale);
+        dc.init();
+        
+        this.modules.add(cd);
         this.modules.add(dc);
     }
     
