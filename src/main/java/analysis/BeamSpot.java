@@ -106,6 +106,10 @@ public class BeamSpot {
         return panel;
     }
     
+    public void test() {
+        modules.get(1).plot(false);
+    }
+    
     public void readHistos(String fileName) {
         System.out.println("Opening file: " + fileName);
         PrintStream pipeStream = new PrintStream(pipeOut);
@@ -231,12 +235,13 @@ public class BeamSpot {
             bs.analyzeHistos();
             if(saveHistos) bs.saveHistos(histoName);
         }
+        
+        bs.test();
 
         if(openWindow) {
             JFrame frame = new JFrame("Beam Spot");
             frame.setSize(1400, 900);
-//            frame.add(bs.plotHistos());
-            frame.add(bs.modules[1].plot());
+            frame.add(bs.plotHistos());
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
             if(printHistos) bs.printHistos();

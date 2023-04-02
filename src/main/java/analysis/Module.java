@@ -46,7 +46,8 @@ public class Module {
     ByteArrayOutputStream pipeOut = new ByteArrayOutputStream();
     private static PrintStream outStream = System.out;
     private static PrintStream errStream = System.err;
-        
+     
+    public void plot(boolean w) {this.plot(w); }
     public Module(String name){                               
         this.moduleName = name;
 //        this.init();
