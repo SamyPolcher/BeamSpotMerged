@@ -39,7 +39,8 @@ public class DCModule  extends Module {
     // -----------------------------------------
     int binsPerSector = 10;
     float fitRangeScale = 1.0f;
-    float targetZ = 25.4f;
+    float zmin = -10f;
+    float zmax = 10f;
     
     // bins used for the beamspot analysis
     double[] theta_bins;
@@ -60,7 +61,7 @@ public class DCModule  extends Module {
 
     public void setFitRangeScale( float s ) { fitRangeScale = s; }
 
-    public void setTargetZ( float z ) { targetZ = z; }
+    public void setTargetZ( float Zmin, float Zmax ) { zmin = Zmin; zmax=Zmax; }
 
     public void setBinsPerSector( int n ) { binsPerSector = n; }
         
@@ -77,8 +78,8 @@ public class DCModule  extends Module {
     @Override
     public void createHistos() {
         
-      final float zmin = (int)(targetZ - 4.4);
-      final float zmax = (int)(targetZ + 15.6);
+      // final float zmin = (int)(targetZ - 4.4);
+      // final float zmax = (int)(targetZ + 15.6);
       int NphiBin = (int)(6*binsPerSector);
       
       // containers for theta bins
@@ -123,7 +124,8 @@ public class DCModule  extends Module {
       
       Axis phiAxis = new Axis(NphiBin, -30, 330);
       Axis zAxis = new Axis(100, zmin, zmax);
-      
+      System.out.printf("DC: The fit will look for the position of the foil in: ( %f ; %f ) \n ", zmin, zmax);
+      //System.out.printf("DC: The z axis considered is: ( %f - %f ) \n ", zmin, zmax);
       phi_bins = phiAxis.getLimits();
       z_bins = zAxis.getLimits();
       
@@ -264,8 +266,8 @@ public class DCModule  extends Module {
       // and fit with a gaussian around the target window position
 
       // peak validity window:
-      final double xmin = targetZ - 6.;
-      final double xmax = targetZ + 6.;
+      //final double xmin = targetZ - 6.;
+      //final double xmax = targetZ + 6.;
 
       // loop  over the phi bins
       for( int i=0; i<phi_bins.length - 1; i++ ){
@@ -277,7 +279,7 @@ public class DCModule  extends Module {
 
         // check if the maximum is in the  expected range for the target window
         final double hmax = h.getAxis().getBinCenter( h.getMaximumBin() ) ;
-        if( hmax < xmin || hmax > xmax ) continue;
+        if( hmax < zmin || hmax > zmax ) continue;
 
         // check the entries around the peak
         final double rms = getRMSInInterval( h, hmax - 5. , hmax + 5. );
@@ -414,7 +416,8 @@ public class DCModule  extends Module {
         if(name.equals("z_slice")) return false;
         else return true;
     }
-    
+   
+   /*
    @Override
     public void setPlottingOptions(String name) {
         this.getCanvas(name).setGridX(false);
@@ -425,7 +428,7 @@ public class DCModule  extends Module {
         EmbeddedPad pad = this.getCanvas(name).getCanvasPads().get(4);
         pad.getAxisX().setRange(VXYMIN, VXYMAX);
         pad.getAxisY().setRange(VXYMIN, VXYMAX);
-    }
+    }*/
     
     public void plot(boolean write) {
 

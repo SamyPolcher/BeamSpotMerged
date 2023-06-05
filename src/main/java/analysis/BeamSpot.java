@@ -40,12 +40,12 @@ public class BeamSpot {
 
     private static String OPTSTAT = "";
     
-    public BeamSpot(String opts, double[] thetaBins, float fitScale, float Ztarget, int NphiBins) {
-        this.init(opts, thetaBins, fitScale, Ztarget, NphiBins);
+    public BeamSpot(String opts, double[] thetaBins, float fitScale, float zmin, float zmax, int NphiBins) {
+        this.init(opts, thetaBins, fitScale, zmin, zmax, NphiBins);
     }
     
 
-    private void init(String opts, double[] thetaBins, float fitScale, float Ztarget, int NphiBins) {
+    private void init(String opts, double[] thetaBins, float fitScale, float zmin, float zmax, int NphiBins) {
         OPTSTAT = opts;
         GStyle.getH1FAttributes().setOptStat(opts);
         GStyle.getAxisAttributesX().setTitleFontSize(24);
@@ -67,7 +67,7 @@ public class BeamSpot {
         
         DCModule dc = new DCModule();
         dc.setThetaBins(thetaBins);
-        dc.setTargetZ(Ztarget);
+        dc.setTargetZ(zmin, zmax);
         dc.setBinsPerSector(NphiBins);
         dc.setFitRangeScale(fitScale);
         dc.init();
@@ -176,7 +176,8 @@ public class BeamSpot {
         parser.addOption("-stats"      ,"",     "histogram stat option (e.g. \"10\" will display entries)");
         // DC analysis settigs
         parser.addOption("-scale", "1.0", "Fit range scale factor");
-        parser.addOption("-Zvertex", "25.4", "Nominal Z position of the Foil");
+        parser.addOption("-zmin", "-10.0", "min z position to fit the Foil");
+        parser.addOption("-zmax", "10.0", "max z position to fit the Foil");
         parser.addOption("-Nphi", "10", "Phi bins per sector");
 
         parser.parse(args);
@@ -193,7 +194,8 @@ public class BeamSpot {
         boolean printHistos   = (parser.getOption("-print").intValue()!=0);
         String  optStats      = parser.getOption("-stats").stringValue(); 
         float  fitScale       = (float)parser.getOption("-scale").doubleValue();
-        float  zTarget        = (float)parser.getOption("-Zvertex").doubleValue();
+        float  zmin        = (float)parser.getOption("-zmin").doubleValue();
+        float  zmax        = (float)parser.getOption("-zmax").doubleValue();
         int NphiBins          = parser.getOption("-Nphi").intValue();
         
         
@@ -201,7 +203,7 @@ public class BeamSpot {
         
         double[] thetaBins = new double[]{10,11,12,13,14,16,18,22,30};
         
-        BeamSpot bs = new BeamSpot(optStats, thetaBins, fitScale, zTarget, NphiBins);
+        BeamSpot bs = new BeamSpot(optStats, thetaBins, fitScale, zmin, zmax, NphiBins);
         
         List<String> inputList = parser.getInputList();
         if(inputList.isEmpty()==true){
