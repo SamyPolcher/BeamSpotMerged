@@ -103,8 +103,11 @@ public class BeamSpot {
             }
             panel.add(m.getName(), canvas);
         }
-        modules.get(1).plot(true);
         return panel;
+    }
+    
+    public void plotDC() {
+        modules.get(1).plot(true);
     }
     
     public void test() {
@@ -177,7 +180,7 @@ public class BeamSpot {
         parser.addOption("-stats"      ,"",     "histogram stat option (e.g. \"10\" will display entries)");
         // DC analysis settigs
         parser.addOption("-scale", "1.0", "Fit range scale factor");
-        parser.addOption("-Zvertex", "25.4", "Nominal Z of Target/Foil");
+        parser.addOption("-Zvertex", "25.4", "Nominal Z position of the Foil");
         parser.addOption("-Nphi", "10", "Phi bins per sector");
 
         parser.parse(args);
@@ -185,7 +188,7 @@ public class BeamSpot {
         String namePrefix  = parser.getOption("-o").stringValue();        
         String histoName   = namePrefix + "histo.hipo";
         if(!namePrefix.isEmpty()) {
-            histoName  = namePrefix + "_" + histoName; 
+            histoName  = namePrefix + "_" + histoName;
         }
         int     maxEvents     = parser.getOption("-n").intValue();
         boolean saveHistos    = (parser.getOption("-x").intValue()==0);
@@ -254,6 +257,8 @@ public class BeamSpot {
             frame.setVisible(true);
             if(printHistos) bs.printHistos();
         }
+        // needed to print all DC plots in a readable way, needed until I can better figure out how groot works
+        bs.plotDC();
     }
 
 }
