@@ -85,27 +85,13 @@ public class Event {
     }
     
     private void readCDTracks(DataEvent event) {
-        DataBank cvtBank   = this.getBank(event, "CVTRec::Tracks");
-        DataBank ucvtBank  = this.getBank(event, "CVTRec::UTracks");
+
         DataBank recPart   = this.getBank(event, "REC::Particle");
         DataBank recTrack  = this.getBank(event, "REC::Track");
         DataBank urecTrack = this.getBank(event, "REC::UTrack");
         DataBank runConfig = this.getBank(event, "RUN::config");
-        if(cvtBank!=null) {
-            for(int i=0; i<cvtBank.rows(); i++) {
-                Track track = Track.readTrack(cvtBank, i);
-                if(runConfig!=null) track.addScale(runConfig);
-                CDtracks.add(track);
-            }
-            if(ucvtBank!=null) {
-                for(int i=0; i<ucvtBank.rows(); i++) {
-                    Track track = Track.readTrack(ucvtBank, i);
-                    if(runConfig!=null) track.addScale(runConfig);
-                    CDutracks.add(track);
-                }
-            }
-        }
-        else if(recPart!=null && recTrack!=null) {
+     
+        if(recPart!=null && recTrack!=null) {
             for (int i = 0; i < recPart.rows(); i++) {    
                 Track track = Track.readParticle(recPart, recTrack, i);
                 if(track.getDetector()!=4 || track.charge()==0) continue;

@@ -106,7 +106,7 @@ public class BeamSpot {
         return panel;
     }
     
-    public void test() {
+    public void plotDC() {
         modules.get(1).plot(false);
     }
     
@@ -139,6 +139,7 @@ public class BeamSpot {
         dir.writeFile(fileName);
         System.setOut(outStream);
         System.setErr(errStream);
+	System.out.println("\n>>>>> "+fileName+" written");	
     }
 
     private void printHistos() {
@@ -148,8 +149,15 @@ public class BeamSpot {
         }
     }
     
+    public void writeCCDB(String outputPrefix) {
+        for(Module m : modules) {
+            m.writeCCDB(outputPrefix);
+        }
+    }
+    
     private void testHistos() {
         for(Module m : modules) {
+            // Not implemented
             m.testHistos();
         }
     }
@@ -161,7 +169,7 @@ public class BeamSpot {
         // valid options for event-base analysis
         parser.addOption("-o"          ,"",     "histogram file name prefix");
         parser.addOption("-n"          ,"-1",   "maximum number of events to process");
-        parser.addOption("-x"          ,"0",   "do NOT save histograms in a hipo file");
+        parser.addOption("-x"          ,"0",    "do NOT save histograms in a hipo file");
         // histogram settings
         parser.addOption("-histo"      ,"0",    "read histogram from hipo file (0/1)");
         parser.addOption("-plot"       ,"1",    "display histograms (0/1)");
@@ -169,7 +177,7 @@ public class BeamSpot {
         parser.addOption("-stats"      ,"",     "histogram stat option (e.g. \"10\" will display entries)");
         // DC analysis settigs
         parser.addOption("-scale", "1.0", "Fit range scale factor");
-        parser.addOption("-Zvertex", "25.4", "Nominal Z of Target/Foil");
+        parser.addOption("-Zvertex", "25.4", "Nominal Z position of the Foil");
         parser.addOption("-Nphi", "10", "Phi bins per sector");
 
         parser.parse(args);
@@ -177,10 +185,10 @@ public class BeamSpot {
         String namePrefix  = parser.getOption("-o").stringValue();        
         String histoName   = "histo.hipo";
         if(!namePrefix.isEmpty()) {
-            histoName  = namePrefix + "_" + histoName; 
+            histoName  = namePrefix + "_" + histoName;
         }
         int     maxEvents     = parser.getOption("-n").intValue();
-        boolean saveHistos    = (parser.getOption("-x").intValue()!=0);
+        boolean saveHistos    = (parser.getOption("-x").intValue()==0);
         boolean readHistos    = (parser.getOption("-histo").intValue()!=0);            
         boolean openWindow    = (parser.getOption("-plot").intValue()!=0);
         boolean printHistos   = (parser.getOption("-print").intValue()!=0);
@@ -236,15 +244,18 @@ public class BeamSpot {
             if(saveHistos) bs.saveHistos(histoName);
         }
         
-        bs.test();
+        bs.writeCCDB(namePrefix);
 
         if(openWindow) {
+	    System.out.println("Starting plots");
             JFrame frame = new JFrame("Beam Spot");
             frame.setSize(1400, 900);
             frame.add(bs.plotHistos());
             frame.setLocationRelativeTo(null);
             frame.setVisible(true);
             if(printHistos) bs.printHistos();
+	    // needed to print all DC plots in a readable way, needed until I can better figure out how groot works
+            bs.plotDC();
         }
     }
 

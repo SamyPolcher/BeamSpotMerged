@@ -1,6 +1,8 @@
 package modules;
 
 import java.lang.Math;
+import java.io.PrintWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -26,13 +28,15 @@ import org.jlab.groot.graphics.GraphicsAxis;
 
 import analysis.Module;
 import objects.Track;
+// import src.main.java.analysis.String;
+// import trash.IOException;
+// import trash.PrintWriter;
 import objects.Event;
 
 public class DCModule  extends Module {
    
     // Attributes
     // -----------------------------------------
-    String outputPrefix = "DCbeamSpot";
     int binsPerSector = 10;
     float fitRangeScale = 1.0f;
     float targetZ = 25.4f;
@@ -46,7 +50,6 @@ public class DCModule  extends Module {
     // ----------------------------------------- 
     public DCModule() {
       super("DCVertex");
-      this.outputPrefix = "DCVertex";
     }
     
 
@@ -67,8 +70,6 @@ public class DCModule  extends Module {
     public double[] getThetaBins() { return theta_bins; }
     
     public int getBinsPerSector() { return binsPerSector;}
-
-    public String getOutputPrefix() { return outputPrefix; }
     
     
     // initialize histograms, graphs and fit functions
@@ -407,6 +408,27 @@ public class DCModule  extends Module {
 
     // plots
     // ------------------------------------
+    
+    @Override
+    public boolean plotGroup(String name) {
+        if(name.equals("z_slice")) return false;
+        else return true;
+    }
+    
+   /*
+   @Override
+    public void setPlottingOptions(String name) {
+        this.getCanvas(name).setGridX(false);
+        this.getCanvas(name).setGridY(false);
+        this.setLogZ(name);
+        double VXYMIN = -1.0;
+        double VXYMAX =  1.0;
+        EmbeddedPad pad = this.getCanvas(name).getCanvasPads().get(4);
+        pad.getAxisX().setRange(VXYMIN, VXYMAX);
+        pad.getAxisY().setRange(VXYMIN, VXYMAX);
+    }
+   */
+    
     public void plot(boolean write) {
 
       EmbeddedCanvasTabbed czfits = new EmbeddedCanvasTabbed( false );
@@ -503,10 +525,26 @@ public class DCModule  extends Module {
         for( int i=0; i<theta_bins.length-1; i++ ){
           String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
           EmbeddedCanvas ci = canvas.getCanvas( cname );
-          ci.save( outputPrefix+"_bin"+i+".png");
+          ci.save( "DC_bin"+i+".png");
         }
-        cp.save(outputPrefix+"_results.png");
+        cp.save("DC_results.png");
       }
+    }
+    
+    @Override
+    public void writeCCDB(String outputPrefix) {
+        try {
+            GraphErrors gX = this.getHistos().get("fit_result").getGraph("gX");
+            GraphErrors gY = this.getHistos().get("fit_result").getGraph("gY");
+            
+            System.out.println("Writing to: "+outputPrefix+"_DC_ccdb_table.txt ...");
+            PrintWriter wr = new PrintWriter( outputPrefix+"_DC_ccdb_table.txt" );
+            wr.printf( "# x y ex ey\n" );
+            wr.printf( "0 0 0 " );
+            wr.printf(  "%.2f %.2f %.2f %.2f\n", gX.getFunction().getParameter(0), gY.getFunction().getParameter(0), 
+                    gX.getFunction().parameter(0).error(), gY.getFunction().parameter(0).error() );
+            wr.close();
+        } catch ( IOException e ) {}
     }
 }
 

@@ -76,6 +76,20 @@ public class Module {
         // Check that the track is right to be analyzed by the module
     }
     
+    public void writeCCDB(String outputPrefix) {
+        // write the ccdb table with the computed vertex position
+    }
+    
+    public boolean plotGroup(String name) {
+        // to select which dataGroup should be ploted in each module
+        return true;
+    }
+    
+    public void setPlottingOptions(String name) {
+        this.getCanvas().getCanvas(name).setGridX(false);
+        this.getCanvas().getCanvas(name).setGridY(false);        
+    }
+    
     // --------------------
 
     public final String getName() {
@@ -135,7 +149,8 @@ public class Module {
     }
 
     public void drawHistos() {
-        for(String key : moduleGroup.keySet()) {            
+        for(String key : moduleGroup.keySet()) {
+            if(!this.plotGroup(key)) continue;
             this.addCanvas(key);
             this.moduleCanvas.getCanvas(key).draw(moduleGroup.get(key));
             this.setPlottingOptions(key);
@@ -158,11 +173,6 @@ public class Module {
     
     public final void setHistos(Map<String,DataGroup> group) {
         this.moduleGroup = group;
-    }
-    
-    public void setPlottingOptions(String name) {
-        this.getCanvas().getCanvas(name).setGridX(false);
-        this.getCanvas().getCanvas(name).setGridY(false);        
     }
 
     public void setLogZ(String name) {
