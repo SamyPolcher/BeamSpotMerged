@@ -45,7 +45,6 @@ public class DCModule  extends Module {
     double[] theta_bins;
     double[] phi_bins;
     double[] z_bins;
-    String outputPrefix = "DC";
 
     // 
     // ----------------------------------------- 
@@ -71,8 +70,6 @@ public class DCModule  extends Module {
     public double[] getThetaBins() { return theta_bins; }
     
     public int getBinsPerSector() { return binsPerSector;}
-
-    public String getOutputPrefix() { return outputPrefix; }
     
     
     // initialize histograms, graphs and fit functions
@@ -418,7 +415,7 @@ public class DCModule  extends Module {
         else return true;
     }
     
-   /* @Override
+   @Override
     public void setPlottingOptions(String name) {
         this.getCanvas(name).setGridX(false);
         this.getCanvas(name).setGridY(false);
@@ -428,7 +425,7 @@ public class DCModule  extends Module {
         EmbeddedPad pad = this.getCanvas(name).getCanvasPads().get(4);
         pad.getAxisX().setRange(VXYMIN, VXYMAX);
         pad.getAxisY().setRange(VXYMIN, VXYMAX);
-    }*/
+    }
     
     public void plot(boolean write) {
 
@@ -526,9 +523,9 @@ public class DCModule  extends Module {
         for( int i=0; i<theta_bins.length-1; i++ ){
           String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
           EmbeddedCanvas ci = canvas.getCanvas( cname );
-          ci.save( outputPrefix+"_bin"+i+".png");
+          ci.save( "DC_bin"+i+".png");
         }
-        cp.save(outputPrefix+"_results.png");
+        cp.save("DC_results.png");
       }
     }
     

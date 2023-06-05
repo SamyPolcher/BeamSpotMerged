@@ -107,10 +107,6 @@ public class BeamSpot {
     }
     
     public void plotDC() {
-        modules.get(1).plot(true);
-    }
-    
-    public void test() {
         modules.get(1).plot(false);
     }
     
@@ -186,7 +182,7 @@ public class BeamSpot {
         parser.parse(args);
         
         String namePrefix  = parser.getOption("-o").stringValue();        
-        String histoName   = namePrefix + "histo.hipo";
+        String histoName   = "histo.hipo";
         if(!namePrefix.isEmpty()) {
             histoName  = namePrefix + "_" + histoName;
         }
