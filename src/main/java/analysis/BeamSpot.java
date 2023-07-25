@@ -172,11 +172,11 @@ public class BeamSpot {
         // general options
         parser.addOption("-o"          ,"",     "histogram file name prefix");
         parser.addOption("-n"          ,"-1",   "maximum number of events to process");
-        parser.addOption("-x"          ,"0",    "do NOT save histograms in a hipo file");
+        parser.addOption("-X"          ,"0",    "do NOT save histograms in a hipo file");
         parser.addOption("-CD"         ,"1",    "set to 0 to deactivate CD beamspot analysis");
         parser.addOption("-DC"         ,"1",    "set to 0 to deactivate DC beamspot analysis");
-        parser.addOption("-xbeam"      ,"0",    "x position of the beam used in cooking (average raster position if raster is used)");
-        parser.addOption("-ybeam"      ,"0",    "y position of the beam used in cooking (average raster position if raster is used)");
+        parser.addOption("-x0"         ,"0",    "x position of the beam used in cooking (average raster position if raster is used)");
+        parser.addOption("-y0"         ,"0",    "y position of the beam used in cooking (average raster position if raster is used)");
 
         // histogram settings
         parser.addOption("-histo"      ,"0",    "read histogram from hipo file (0/1)");
@@ -199,7 +199,7 @@ public class BeamSpot {
         }
 
         int     maxEvents     = parser.getOption("-n").intValue();
-        boolean saveHistos    = (parser.getOption("-x").intValue()==0);
+        boolean saveHistos    = (parser.getOption("-X").intValue()==0);
         boolean runCD         = (parser.getOption("-CD").intValue()==1);
         boolean runDC         = (parser.getOption("-DC").intValue()==1);
         boolean readHistos    = (parser.getOption("-histo").intValue()!=0);            
@@ -212,8 +212,8 @@ public class BeamSpot {
         int NphiBins          = parser.getOption("-Nphi").intValue();
         
         // beam position in cooking
-        float  x0             = (float)parser.getOption("-xbeam").doubleValue();
-        float  y0             = (float)parser.getOption("-ybeam").doubleValue();
+        float  x0             = (float)parser.getOption("-x0").doubleValue();
+        float  y0             = (float)parser.getOption("-y0").doubleValue();
         System.out.println("test (" + x0 + "," + y0 + ")\n");
         Event.setAvgBeamPos(x0, y0);
 
