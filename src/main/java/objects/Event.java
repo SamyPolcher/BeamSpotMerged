@@ -23,11 +23,15 @@ public class Event {
     private double startTime;
 
     private final List<Track> particles  = new ArrayList<>();
-    private final List<Track> CDtracks     = new ArrayList<>();
-    private final List<Track> FDtracks     = new ArrayList<>();
-    private final List<Track> CDutracks     = new ArrayList<>();
+    private final List<Track> CDtracks   = new ArrayList<>();
+    private final List<Track> FDtracks   = new ArrayList<>();
+    private final List<Track> CDutracks  = new ArrayList<>();
   
     private DataEvent hipoEvent;
+
+    // Average beam position used in the cooking (average raster position if raster is used)
+    private static float x0 = 0.f;
+    private static float y0 = 0.f;
 
     public Event(DataEvent event) {
         this.hipoEvent = event;
@@ -35,7 +39,18 @@ public class Event {
         if(debug) System.out.println("Read event with " + CDtracks.size() + " particles");
     }
     
+    public static void setAvgBeamPos(float x, float y){
+        x0 = x;
+        y0 = y;
+    }
 
+    public float getx0(){
+        return x0;
+    }
+
+    public float gety0(){
+        return y0;
+    }
 
     private DataBank getBank(DataEvent de, String bankName) {
         DataBank bank = null;
@@ -86,16 +101,38 @@ public class Event {
     
     private void readCDTracks(DataEvent event) {
 
+        DataBank cvtBank = this.getBank(event, "CVTRec::Tracks");
+        DataBank ucvtBank = this.getBank(event, "CVTRec::UTracks");
         DataBank recPart   = this.getBank(event, "REC::Particle");
         DataBank recTrack  = this.getBank(event, "REC::Track");
         DataBank urecTrack = this.getBank(event, "REC::UTrack");
         DataBank runConfig = this.getBank(event, "RUN::config");
-     
+        DataBank rasterPos = this.getBank(event, "RASTER::position");
+
+        // if(cvtBank!=null) {
+        //     for(int i=0; i<cvtBank.rows(); i++) {
+        //         Track track = Track.readTrack(cvtBank, i);
+        //         if(runConfig!=null) track.addScale(runConfig);
+        //         CDtracks.add(track);
+        //     }
+        //     if(ucvtBank!=null) {
+        //         for(int i=0; i<ucvtBank.rows(); i++) {
+        //             Track track = Track.readTrack(ucvtBank, i);
+        //             if(runConfig!=null) track.addScale(runConfig);
+        //             CDutracks.add(track);
+        //         }
+        //     }
+        // }
         if(recPart!=null && recTrack!=null) {
             for (int i = 0; i < recPart.rows(); i++) {    
                 Track track = Track.readParticle(recPart, recTrack, i);
                 if(track.getDetector()!=4 || track.charge()==0) continue;
                 if(runConfig!=null) track.addScale(runConfig);
+                if(rasterPos!=null){
+                    track.setxbyb(rasterPos.getFloat("x", 0) + x0, rasterPos.getFloat("y", 0) + y0);
+                }else{
+                    track.setxbyb(x0, y0);
+                }
                 CDtracks.add(track);
             }            
             if(urecTrack!=null) {
@@ -103,6 +140,11 @@ public class Event {
                     Track track = Track.readParticle(recPart, recTrack, urecTrack, i);
                     if(track.getDetector()!=4 || track.charge()==0) continue;
                     if(runConfig!=null) track.addScale(runConfig);
+                    if(rasterPos!=null){
+                        track.setxbyb(rasterPos.getFloat("x", 0) + x0, rasterPos.getFloat("y", 0) + y0);
+                    }else{
+                        track.setxbyb(x0, y0);
+                    }
                     CDutracks.add(track);
                 }            
             }
@@ -114,14 +156,20 @@ public class Event {
         DataBank recPart   = this.getBank(event, "REC::Particle");
         DataBank recTrack  = this.getBank(event, "REC::Track");
         DataBank runConfig = this.getBank(event, "RUN::config");
+        DataBank rasterPos = this.getBank(event, "RASTER::position");
        
         if(recPart!=null && recTrack!=null) {
             for (int i = 0; i < recPart.rows(); i++) {    
                 Track track = Track.readParticle(recPart, recTrack, i);
                 if(track.getDetector()!=2 || track.charge()==0) continue;
                 if(runConfig!=null) track.addScale(runConfig);
+                if(rasterPos!=null){
+                    track.setxbyb(rasterPos.getFloat("x", 0) + x0, rasterPos.getFloat("y", 0) + y0);
+                }else{
+                    track.setxbyb(x0, y0);
+                }
                 FDtracks.add(track);
-            }            
+            }
         }
     }
     

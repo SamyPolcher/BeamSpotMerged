@@ -25,6 +25,7 @@ import org.jlab.groot.group.DataGroup;
 import org.jlab.groot.math.F1D;
 import org.jlab.groot.math.Func1D;
 import org.jlab.groot.graphics.GraphicsAxis;
+import org.jlab.groot.data.TDirectory;
 
 import analysis.Module;
 import objects.Track;
@@ -38,8 +39,11 @@ public class DCModule  extends Module {
     // Attributes
     // -----------------------------------------
     int binsPerSector = 10;
-    float fitRangeScale = 1.0f;
     float targetZ = 25.4f;
+
+    // peak validity for the fit window:
+    float fitMin = 0.f;
+    float fitMax = 0.f;
     
     // bins used for the beamspot analysis
     double[] theta_bins;
@@ -58,9 +62,13 @@ public class DCModule  extends Module {
 
     public void setThetaBins( double[] bins ) { theta_bins = bins; }
 
-    public void setFitRangeScale( float s ) { fitRangeScale = s; }
-
-    public void setTargetZ( float z ) { targetZ = z; }
+    public void setTargetZ( float z, float zmin, float zmax ) {
+      targetZ = z;
+      fitMin = zmin;
+      fitMax = zmax;
+      if(zmin==0) fitMin = targetZ - 6.f;
+      if(zmax==0) fitMax = targetZ + 6.f;
+    }
 
     public void setBinsPerSector( int n ) { binsPerSector = n; }
         
@@ -77,8 +85,8 @@ public class DCModule  extends Module {
     @Override
     public void createHistos() {
         
-      final float zmin = (int)(targetZ - 4.4);
-      final float zmax = (int)(targetZ + 15.6);
+      final float zmin = (int)(targetZ - 8.);
+      final float zmax = (int)(targetZ + 16);
       int NphiBin = (int)(6*binsPerSector);
       
       // containers for theta bins
@@ -88,14 +96,16 @@ public class DCModule  extends Module {
       // containers for z slice fits
       DataGroup dg_z_slice = new DataGroup(NphiBin, theta_bins.length-1);
       
-      // containers for general 1D histograms, z and phi distributions
+      // containers for general 1D histograms, z and phi distributions, xb, yb distrib
       DataGroup dg_distrib = new DataGroup(1, 2);
       
       // containers for for plotting the fits results as a function of theta
       DataGroup dg_fit_results = new DataGroup(1, 5);
       
-      H1F h1_z   = new H1F( "vz",   "z vertex"  , 200, -20, 50 ); dg_distrib.addDataSet(h1_z, 0);
-      H1F h1_phi = new H1F( "phi", "phi distribution", 180, -30, 330 ); dg_distrib.addDataSet(h1_phi, 1);
+      H1F h1_z   = new H1F( "vz",   "z vertex"  , 200, -20, 50 );         dg_distrib.addDataSet(h1_z, 0);
+      H1F h1_phi = new H1F( "phi", "phi distribution", 180, -30, 330 );   dg_distrib.addDataSet(h1_phi, 1);
+      H1F h1_xb  = histo1D("xb", "xb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 2);
+      H1F h1_yb  = histo1D("yb", "yb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 3);
         
       // graphs for plotting the results as a function of theta
       GraphErrors gZ = new GraphErrors("gZ");  // Z 
@@ -122,7 +132,7 @@ public class DCModule  extends Module {
       dg_fit_results.addDataSet(gY, 4);
       
       Axis phiAxis = new Axis(NphiBin, -30, 330);
-      Axis zAxis = new Axis(100, zmin, zmax);
+      Axis zAxis = new Axis(100, zmin, zmax );
       
       phi_bins = phiAxis.getLimits();
       z_bins = zAxis.getLimits();
@@ -151,13 +161,14 @@ public class DCModule  extends Module {
       this.getHistos().put("peak_position", dg_peak);
       this.getHistos().put("fit_result",  dg_fit_results);
       this.getHistos().put("z_slice",  dg_z_slice);
-}
+    }
 
     
     @Override
     public boolean checkTrack(Track trk) {
         // if(trk.getNDF()<1 || trk.getChi2()/trk.getNDF()>30 || trk.pt()<0.2) return false;
-        if(trk.pid()!=11 || trk.p()<1.5) return false;
+        // if(trk.charge()>=0 || trk.p()<1.) return false;
+        if(trk.pid()!=11 || trk.p()<1.) return false;
         return true;
     }
     
@@ -188,11 +199,59 @@ public class DCModule  extends Module {
               // fill histograms
               this.getHistos().get("distribution").getH1F("vz").fill(track.vz());
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
+              this.getHistos().get("distribution").getH1F("xb").fill(track.xb());
+              this.getHistos().get("distribution").getH1F("yb").fill(track.yb());
+
               this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(track.vz(), phi);
               this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(track.vz());
           }
       }
     }
+
+
+    @Override
+    public void addDataGroup(DataGroup dg, String key){
+        if(key=="distribution"){
+          this.fillFromDir1D(dg, "distribution", "vz");
+          this.fillFromDir1D(dg, "distribution", "phi");
+          this.fillFromDir1D(dg, "distribution", "xb");
+          this.fillFromDir1D(dg, "distribution", "yb");
+        }
+        else if(key=="z_phi"){
+          for(int i=0; i<theta_bins.length-1; i++){
+            this.fillFromDir2D(dg, "z_phi", "z_phi_"+i);
+          }
+        }
+        else if(key=="z_slice"){
+          for(int i=0; i<theta_bins.length-1; i++){
+            for(int j=0; j<phi_bins.length-1; j++){
+              this.fillFromDir1D(dg, "z_slice", "slice_"+i+"_"+j);
+            }
+          }
+        }
+        else System.out.println(key+" DataGroup not added to "+this.getName()+" existing groups");
+    }
+
+    // public void readDataGroup(TDirectory dir) {
+
+    //   System.out.println("in readdatagroup");
+    //   String folder = "/" + this.getName() + "/";
+    //   dir.cd(folder);
+    //   System.out.println("Reading from: " + folder);
+
+    //   this.fillFromDir1D(dir, "distribution", "vz");
+    //   this.fillFromDir1D(dir, "distribution", "phi");
+
+    //   for(int i=0; i<theta_bins.length-1; i++){
+    //     this.fillFromDir2D(dir, "z_phi", "z_phi_"+i);
+    //     for(int j=0; j<phi_bins.length-1; j++){
+    //       this.fillFromDir1D(dir, "z_slice", "slice_"+i+"_"+j);
+    //     }
+
+    //   }
+    // }
+
+
 
 
     // analysis
@@ -263,10 +322,6 @@ public class DCModule  extends Module {
       // loop over the phi bins of the 2D histogram phi vs z
       // and fit with a gaussian around the target window position
 
-      // peak validity window:
-      final double xmin = targetZ - 6.;
-      final double xmax = targetZ + 6.;
-
       // loop  over the phi bins
       for( int i=0; i<phi_bins.length - 1; i++ ){
 
@@ -275,29 +330,22 @@ public class DCModule  extends Module {
 
         if( h.integral() < 10 ) continue;  // to skip empty bins
 
-        // check if the maximum is in the  expected range for the target window
-        final double hmax = h.getAxis().getBinCenter( h.getMaximumBin() ) ;
-        if( hmax < xmin || hmax > xmax ) continue;
-
-        // check the entries around the peak
-        final double rms = getRMSInInterval( h, hmax - 5. , hmax + 5. );
-        double rmin = h.getAxis().getBinCenter( h.getMaximumBin() ) - 2.0*rms*fitRangeScale;
-        double rmax = h.getAxis().getBinCenter( h.getMaximumBin() ) + 1.5*rms*fitRangeScale;
-
-        // truncate fit range if out of bounds:
-        if (rmin < h.getAxis().getBinCenter(1)) rmin = h.getAxis().getBinCenter(1);
-        if (rmax > h.getAxis().getBinCenter(h.getAxis().getNBins()-1))
-          rmax = h.getAxis().getBinCenter(h.getAxis().getNBins()-1);
+        // compute rms over fitting interval
+        final double rms = getRMSInInterval( h, fitMin , fitMax );
 
         // skip if there are not enough entries
-        if( h.integral( h.getAxis().getBin(rmin) , h.getAxis().getBin(rmax) ) < 50 ) continue;
+        if( h.integral( h.getAxis().getBin(fitMin) , h.getAxis().getBin(fitMax) ) < 30 ) continue;
 
         // the fit function of the target window peak, a gaussian for simplicity
-        // the fit range is +- RMS around the peak
-        F1D func = new F1D( "func_"+thetaBin+"_"+i, "[amp]*gaus(x,[mean],[sigma]) + [c] + [d]*x", rmin, rmax ); 
+        F1D func = new F1D( "func_"+thetaBin+"_"+i, "[amp]*gaus(x,[mean],[sigma]) + [c] + [d]*x", fitMin, fitMax );
         func.setParameter(0, h.getBinContent( h.getMaximumBin() ) );
-        func.setParameter(1, h.getAxis().getBinCenter( h.getMaximumBin() )  ); 
-        func.setParameter(2, rms/2. );
+
+        func.setParameter(1, this.getMeanInInterval(h, fitMin, fitMax) );
+        func.setParLimits(1, fitMin, fitMax);
+
+        func.setParameter(2, rms );
+        func.setParLimits(2, 0.3, 1);
+
         func.setParameter(3, 1. );
         func.setParameter(4, .01 );
         func.setOptStat(110);
@@ -312,14 +360,20 @@ public class DCModule  extends Module {
         // skip if Gaussian sigma too big:
         if (Math.abs(func.getParameter(2)) > 2) continue;
 
+
         // skip if chi-square bad:
         if (func.getChiSquare()/func.getNDF() < 0.05) continue;
         if (func.getChiSquare()/func.getNDF() > 10) continue;
 
         // store the fit result in the corresponding graph
+        // g_peak.addPoint( 
+            // h2_z_phi.getYAxis().getBinCenter( i ), func.getParameter(1),
+            // 0, func.parameter(1).error() );
+        // }
+
         g_peak.addPoint( 
             h2_z_phi.getYAxis().getBinCenter( i ), func.getParameter(1),
-            0, func.parameter(1).error() );
+            0, func.getParameter(2));
       }
 
       // extract the modulation of the target z position versus phi by fitting the graph, the function is defined in createHistos()
@@ -438,7 +492,7 @@ public class DCModule  extends Module {
         String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
         czfits.addCanvas( cname );
         EmbeddedCanvas ci = czfits.getCanvas( cname );
-        ci.divide(7,8);
+        ci.divide(4,5);
         
         for( int j=0; j<phi_bins.length-1; j++ ){
           H1F h = this.getHistos().get("z_slice").getH1F("slice_"+i+"_"+j);
@@ -453,6 +507,8 @@ public class DCModule  extends Module {
           ci.setAxisLabelSize(8);
           ci.setAxisTitleSize(8);
           ci.setAxisTitleSize(8);
+          ci.getPad(j).getAxisY().setLog(true);
+
           ci.draw( h );
           
           if(func != null) {
@@ -483,8 +539,12 @@ public class DCModule  extends Module {
         EmbeddedCanvas ci = canvas.getCanvas( cname );
         ci.divide(2,1);
         ci.cd(0).setAxisTitleSize(18);
+        ci.getPad(0).getAxisZ().setLog(true);
         ci.draw( h2_z_phi );
         ci.cd(1).setAxisTitleSize(18);
+        // ci.getPad(1).getAxisY().setAxisMinimum(4);
+        // ci.getPad(1).getAxisY().setAxisMaximum(10);
+
         ci.draw( g_peak );
       }
       
@@ -536,14 +596,25 @@ public class DCModule  extends Module {
         try {
             GraphErrors gX = this.getHistos().get("fit_result").getGraph("gX");
             GraphErrors gY = this.getHistos().get("fit_result").getGraph("gY");
+
+            //relative offset
+            Double vx = gX.getFunction().getParameter(0);
+            Double vy = gY.getFunction().getParameter(0);
+            Double e_vx = gX.getFunction().parameter(0).error();
+            Double e_vy = gY.getFunction().parameter(0).error();
+
+            Double xb = this.getHistos().get("distribution").getH1F("xb").getMean();
+            Double yb = this.getHistos().get("distribution").getH1F("yb").getMean();
             
+            //absolute position
             System.out.println("Writing to: "+outputPrefix+"_DC_ccdb_table.txt ...");
             PrintWriter wr = new PrintWriter( outputPrefix+"_DC_ccdb_table.txt" );
-            wr.printf( "# x y ex ey\n" );
+            wr.printf( "# x y ex ey in cm\n" );
             wr.printf( "0 0 0 " );
-            wr.printf(  "%.2f %.2f %.2f %.2f\n", gX.getFunction().getParameter(0), gY.getFunction().getParameter(0), 
-                    gX.getFunction().parameter(0).error(), gY.getFunction().parameter(0).error() );
+            wr.printf(  "%.3f %.3f %.3f %.3f\n", xb+vx, yb+vy, e_vx, e_vy);
+            wr.printf( "# absolute position with respect to an average beam position: %3f %3f \n", xb, yb);
             wr.close();
+            System.out.println(wr);
         } catch ( IOException e ) {}
     }
 }

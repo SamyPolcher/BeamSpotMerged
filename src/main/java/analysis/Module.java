@@ -84,6 +84,10 @@ public class Module {
         // to select which dataGroup should be ploted in each module
         return true;
     }
+
+    public void addDataGroup(DataGroup dg, String key){
+
+    }
     
     public void setPlottingOptions(String name) {
         this.getCanvas().getCanvas(name).setGridX(false);
@@ -214,7 +218,7 @@ public class Module {
         }
     }
         
-    public final void readDataGroup(TDirectory dir) {
+    public void readDataGroup(TDirectory dir) {
         for(String key : moduleGroup.keySet()) {
             String folder = this.getName() + "/" + key + "/";
             System.out.println("Reading from: " + folder);
@@ -232,10 +236,41 @@ public class Module {
                     else
                         newGroup.addDataSet(ds,i);
                 }
-            }            
-            this.moduleGroup.replace(key, newGroup);
+            }
+            this.addDataGroup(newGroup, key);            
+            // this.moduleGroup.replace(key, newGroup);
         }
     }
+
+
+    public void fillFromDir1D(DataGroup dg, String dgName, String key){
+      H1F hdg = dg.getH1F(key);
+      H1F h = this.getHistos().get(dgName).getH1F(key);
+
+      for (int ix=0; ix<hdg.getXaxis().getNBins(); ix++) {
+        for (int iz = 0; iz<hdg.getBinContent(ix); iz++) {
+          double x = hdg.getXaxis().getBinCenter(ix);
+          h.fill(x);
+        }
+      }
+    }
+
+
+    public void fillFromDir2D(DataGroup dg, String dgName, String key){
+      H2F hdg = dg.getH2F(key);
+      H2F h = this.getHistos().get(dgName).getH2F(key);
+
+      for (int ix = 0; ix<hdg.getXAxis().getNBins(); ix++) {
+        for (int iy = 0; iy<hdg.getYAxis().getNBins(); iy++) {
+          for (int iz = 0; iz<hdg.getBinContent(ix,iy); iz++) {
+            double x = hdg.getXAxis().getBinCenter(ix);
+            double y = hdg.getYAxis().getBinCenter(iy);
+            h.fill(x,y);
+          }
+        }
+      }
+    }
+
     
     public final void writeDataGroup(TDirectory dir) {
         String folder = "/" + this.getName();

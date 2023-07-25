@@ -40,12 +40,12 @@ public class BeamSpot {
 
     private static String OPTSTAT = "";
     
-    public BeamSpot(String opts, double[] thetaBins, float fitScale, float Ztarget, int NphiBins) {
-        this.init(opts, thetaBins, fitScale, Ztarget, NphiBins);
+    public BeamSpot(Boolean runCD, Boolean runDC, String opts, double[] thetaBins, float Ztarget, float zmin, float zmax, int NphiBins) {
+        this.init(runCD, runDC, opts, thetaBins, Ztarget, zmin, zmax, NphiBins);
     }
     
 
-    private void init(String opts, double[] thetaBins, float fitScale, float Ztarget, int NphiBins) {
+    private void init(Boolean runCD, Boolean runDC, String opts, double[] thetaBins, float Ztarget, float zmin, float zmax, int NphiBins) {
         OPTSTAT = opts;
         GStyle.getH1FAttributes().setOptStat(opts);
         GStyle.getAxisAttributesX().setTitleFontSize(24);
@@ -62,22 +62,24 @@ public class BeamSpot {
         GStyle.setGraphicsFrameLineWidth(2);
         GStyle.getH1FAttributes().setLineWidth(1);
         
-        CDModule cd = new CDModule();
-        cd.init();
-        
-        DCModule dc = new DCModule();
-        dc.setThetaBins(thetaBins);
-        dc.setTargetZ(Ztarget);
-        dc.setBinsPerSector(NphiBins);
-        dc.setFitRangeScale(fitScale);
-        dc.init();
-        
-        this.modules.add(cd);
-        this.modules.add(dc);
+        if(runCD){
+            CDModule cd = new CDModule();
+            cd.init();
+            this.modules.add(cd);
+        }
+        if(runDC){
+            DCModule dc = new DCModule();
+            dc.setThetaBins(thetaBins);
+            dc.setTargetZ(Ztarget, zmin, zmax);
+            dc.setBinsPerSector(NphiBins);
+            dc.init();
+            this.modules.add(dc);
+        }
     }
     
     private void processEvent(DataEvent de) {
         Event event = new Event(de);
+        System.out.printf("nominal beam position (%2.3f, %2.3f) cm\n", event.getx0(), event.gety0());
         
         for(Module m : modules) m.processEvent(event);
     }
@@ -107,7 +109,7 @@ public class BeamSpot {
     }
     
     public void plotDC() {
-        modules.get(1).plot(false);
+        modules.get(1).plot(true);
     }
     
     public void readHistos(String fileName) {
@@ -166,19 +168,27 @@ public class BeamSpot {
         
         OptionParser parser = new OptionParser("Beam Spot [options] file1 file2 ... fileN");
         parser.setRequiresInputList(false);
-        // valid options for event-base analysis
+
+        // general options
         parser.addOption("-o"          ,"",     "histogram file name prefix");
         parser.addOption("-n"          ,"-1",   "maximum number of events to process");
         parser.addOption("-x"          ,"0",    "do NOT save histograms in a hipo file");
+        parser.addOption("-CD"         ,"1",    "set to 0 to deactivate CD beamspot analysis");
+        parser.addOption("-DC"         ,"1",    "set to 0 to deactivate DC beamspot analysis");
+        parser.addOption("-x0"         ,"0",    "x position of the beam used in cooking (average raster position if raster is used)");
+        parser.addOption("-y0"         ,"0",    "y position of the beam used in cooking (average raster position if raster is used)");
+
         // histogram settings
         parser.addOption("-histo"      ,"0",    "read histogram from hipo file (0/1)");
         parser.addOption("-plot"       ,"1",    "display histograms (0/1)");
         parser.addOption("-print"      ,"0",    "print canvases (0/1)");
         parser.addOption("-stats"      ,"",     "histogram stat option (e.g. \"10\" will display entries)");
+        
         // DC analysis settigs
-        parser.addOption("-scale", "1.0", "Fit range scale factor");
-        parser.addOption("-Zvertex", "25.4", "Nominal Z position of the Foil");
-        parser.addOption("-Nphi", "10", "Phi bins per sector");
+        parser.addOption("-Zvertex", "25.4", "nominal Z position of the Foil");
+        parser.addOption("-zmin", "0.", "lower bound of the foil fit window in z");
+        parser.addOption("-zmax", "0.", "upper bound of the foil fit window in z");
+        parser.addOption("-Nphi", "10", "phi bins per sector");
 
         parser.parse(args);
         
@@ -187,22 +197,31 @@ public class BeamSpot {
         if(!namePrefix.isEmpty()) {
             histoName  = namePrefix + "_" + histoName;
         }
+
         int     maxEvents     = parser.getOption("-n").intValue();
         boolean saveHistos    = (parser.getOption("-x").intValue()==0);
+        boolean runCD         = (parser.getOption("-CD").intValue()==1);
+        boolean runDC         = (parser.getOption("-DC").intValue()==1);
         boolean readHistos    = (parser.getOption("-histo").intValue()!=0);            
         boolean openWindow    = (parser.getOption("-plot").intValue()!=0);
         boolean printHistos   = (parser.getOption("-print").intValue()!=0);
         String  optStats      = parser.getOption("-stats").stringValue(); 
-        float  fitScale       = (float)parser.getOption("-scale").doubleValue();
         float  zTarget        = (float)parser.getOption("-Zvertex").doubleValue();
+        float  zmin           = (float)parser.getOption("-zmin").doubleValue();
+        float  zmax           = (float)parser.getOption("-zmax").doubleValue();
         int NphiBins          = parser.getOption("-Nphi").intValue();
         
-        
+        // beam position in cooking
+        float  x0             = (float)parser.getOption("-x0").doubleValue();
+        float  y0             = (float)parser.getOption("-y0").doubleValue();
+        Event.setAvgBeamPos(x0, y0);
+
         if(!openWindow) System.setProperty("java.awt.headless", "true");
         
-        double[] thetaBins = new double[]{10,11,12,13,14,16,18,22,30};
-        
-        BeamSpot bs = new BeamSpot(optStats, thetaBins, fitScale, zTarget, NphiBins);
+        // double[] thetaBins = new double[]{10,20,30};
+        // double[] thetaBins = new double[]{10,11,12,13,14,16,18,22,30};
+        double[] thetaBins = new double[]{10, 15, 20, 25, 30};
+        BeamSpot bs = new BeamSpot(runCD, runDC, optStats, thetaBins, zTarget, zmin, zmax, NphiBins);
         
         List<String> inputList = parser.getInputList();
         if(inputList.isEmpty()==true){
@@ -212,7 +231,9 @@ public class BeamSpot {
         }
 
         if(readHistos) {
-            bs.readHistos(inputList.get(0));
+            for(String inputFile : inputList){
+                bs.readHistos(inputFile);
+            }
             bs.analyzeHistos();
         }
         else{
@@ -223,7 +244,6 @@ public class BeamSpot {
             for(String inputFile : inputList){
                 HipoDataSource reader = new HipoDataSource();
                 reader.open(inputFile);
-
                 
                 while (reader.hasEvent()) {
 
@@ -255,7 +275,7 @@ public class BeamSpot {
             frame.setVisible(true);
             if(printHistos) bs.printHistos();
 	    // needed to print all DC plots in a readable way, needed until I can better figure out how groot works
-            bs.plotDC();
+            if(runDC) bs.plotDC();
         }
     }
 

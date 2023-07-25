@@ -21,6 +21,8 @@ public class Track extends Particle {
     private double beta = -1;
     private double chi2pid = Double.POSITIVE_INFINITY;
     private double chi2;
+    private float xb = 0;
+    private float yb = 0;
     private int recStatus=0;
     private int status=0;
     private int index = -1;
@@ -31,6 +33,12 @@ public class Track extends Particle {
     
     Track(int pid, double px, double py, double pz, double vx, double vy, double vz) {
         super(pid, px, py, pz, vx, vy, vz);
+    }
+
+    Track(int pid, double px, double py, double pz, double vx, double vy, double vz, float ixb, float iyb) {
+        super(pid, px, py, pz, vx, vy, vz);
+        this.xb = ixb;
+        this.yb = iyb;
     }
     
     public static Track readParticle(DataBank recPart, DataBank recTrack, int row) {
@@ -82,9 +90,49 @@ public class Track extends Particle {
         }       
         return t;
     }
+
+     public static Track readTrack(DataBank bank, int row) {
+
+        int pid = bank.getInt("pid", row);
+        int charge = bank.getByte("q", row);
+        double pt =  bank.getFloat("pt", row);
+        double tandip = bank.getFloat("tandip", row);
+        double phi0 = bank.getFloat("phi0", row);
+        double d0 = bank.getFloat("d0", row);
+        float x0 = bank.getFloat("xb", row);
+        float y0 = bank.getFloat("yb", row);
+
+        Track t = new Track(211*charge, //I think that it's because CVTRec pid is not reliable
+            pt*Math.cos(phi0),
+            pt*Math.sin(phi0),
+            pt*tandip,
+            -d0 * Math.sin(phi0) + x0,
+            d0 * Math.cos(phi0) + y0,
+            bank.getFloat("z0", row),
+            x0,
+            y0
+        );
+        t.setNDF(bank.getShort("ndf", row));
+        t.setChi2(bank.getFloat("chi2", row));
+        t.setStatus(bank.getShort("status", row));
+        return t;
+    }
     
     public void addScale(DataBank config) {
         this.solenoid = config.getFloat("solenoid", 0);
+    }
+
+    public void setxbyb(float xb, float yb){
+        this.xb = xb;
+        this.yb = yb;
+    }
+
+    public float xb(){
+        return this.xb;
+    }
+
+    public float yb(){
+        return this.yb;
     }
 
     public int getNDF() {
@@ -176,7 +224,7 @@ public class Track extends Particle {
         if (Math.signum(kappa) < 0) {
             phi0 = Math.atan2(-ycen, -xcen);
         }
-        double drh0 = (xcen)*Math.cos(phi0) + (ycen)*Math.sin(phi0) - Constants.ALPHA/ kappa;
+        double drh0 = (xcen-xb)*Math.cos(phi0) + (ycen-yb)*Math.sin(phi0) - Constants.ALPHA/ kappa;
         return -drh0;
 //        return Math.signum(this.vy()/Math.cos(this.phi()))*Math.sqrt(this.vx()*this.vx()+this.vy()*this.vy());
     }

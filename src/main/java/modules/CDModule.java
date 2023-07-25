@@ -37,11 +37,13 @@ public class CDModule extends Module {
     
     private final double CHI2PIDCUT = 10;
     
-    // To store the position of the beam with respect to the default cooking value of (0, 0) and their error 
-    List<Double> vx = new ArrayList<Double> ();
-    List<Double> vy = new ArrayList<Double> ();
-    List<Double> e_vx = new ArrayList<Double> ();
-    List<Double> e_vy = new ArrayList<Double> ();
+    // To store the position of the beam with respect to the ref value of (avg xb, avg yb) and their error in cm
+    Double vxRef = 0.;
+    Double vyRef = 0.;
+    Double e_vxRef = 0.;
+    Double e_vyRef = 0.;
+    Double xbRef = 0.;
+    Double ybRef = 0.;
     
     public CDModule() {
         super("CDVertex_");
@@ -121,6 +123,8 @@ public class CDModule extends Module {
             group.getH2F("hi_d0phi").fill(Math.toDegrees(track.phi()),track.d0());
             group.getH1F("hi_vz").fill(track.vz());
             group.getH2F("hi_vxy").fill(track.vx(),track.vy());
+            group.getH1F("hi_xb").fill(track.xb());
+            group.getH1F("hi_yb").fill(track.yb());
             group.getH2F("hi_vxphi").fill(Math.toDegrees(track.phi()),track.vx());
             group.getH2F("hi_vyphi").fill(Math.toDegrees(track.phi()),track.vy());
             group.getH2F("hi_vzphi").fill(Math.toDegrees(track.phi()),track.vz());
@@ -141,19 +145,30 @@ public class CDModule extends Module {
         F1D f1 = this.fitD0Phi(h2, gr);
         
         if(findVertex) {
+
             System.out.printf("\nAnalyzing Vertex group: " + name +"\n");
             System.out.printf("d0(phi) = p0 sin(p1 x + p2):\n");
             for(int i=0; i<f1.getNPars(); i++)
                 System.out.printf("\t p%d = (%.4f +/- %.4f)\n", i, f1.getParameter(i), f1.parameter(i).error());
-           
-            vx.add( -10*f1.getParameter(0)*Math.cos(f1.getParameter(2)) );
-            vy.add( 10*f1.getParameter(0)*Math.sin(f1.getParameter(2)) );
-            e_vx.add( 10*Math.sqrt(Math.pow(f1.parameter(0).error()*Math.cos(f1.getParameter(2)),2)+
-                                      Math.pow(f1.getParameter(0)*Math.sin(f1.getParameter(2))*f1.parameter(2).error(),2)) );
-            e_vy.add( 10*Math.sqrt(Math.pow(f1.parameter(0).error()*Math.sin(f1.getParameter(2)),2)+
-                                      Math.pow(f1.getParameter(0)*Math.cos(f1.getParameter(2))*f1.parameter(2).error(),2)) );
-            System.out.printf("x_offset: (%2.3f +/- %2.3f) mm, y_offset: (%2.3f +/- %2.3f) mm\n", vx.get(vx.size() - 1), e_vx.get(e_vx.size() - 1), 
-                    vy.get(vy.size() - 1), e_vy.get(e_vy.size() - 1)); // convert to mm
+            double xb =  this.getHistos().get(name).getH1F("hi_xb").getMean();
+            double yb =  this.getHistos().get(name).getH1F("hi_yb").getMean();
+            double dx = -f1.getParameter(0)*Math.cos(f1.getParameter(2));
+            double dy =  f1.getParameter(0)*Math.sin(f1.getParameter(2));
+            double edx = Math.sqrt(Math.pow(f1.parameter(0).error()*Math.cos(f1.getParameter(2)),2)+
+                                      Math.pow(f1.getParameter(0)*Math.sin(f1.getParameter(2))*f1.parameter(2).error(),2));
+            double edy = Math.sqrt(Math.pow(f1.parameter(0).error()*Math.sin(f1.getParameter(2)),2)+
+                                      Math.pow(f1.getParameter(0)*Math.cos(f1.getParameter(2))*f1.parameter(2).error(),2));
+            System.out.printf("x_offset: (%2.3f +/- %2.3f) cm, y_offset: (%2.3f +/- %2.3f) cm\n", dx, edx, dy, edy);
+            System.out.printf("  with respect to average beam position: (%2.3f, %2.3f) cm\n", xb, yb);      
+            System.out.printf("Update the beam (x,y) position to: (%2.3f, %2.3f) cm\n", xb+dx, yb+dy);       
+            System.out.printf("or shift the detector position by: (%2.3f, %2.3f) cm\n", -dx, -dy);
+
+            if(name == "UNegatives"){
+                vxRef = xb+dx; vyRef = yb+dy;
+                e_vxRef = edx; e_vyRef = edy;
+                xbRef = xb;
+                ybRef = yb;
+            }
         }
     }
     
@@ -190,23 +205,32 @@ public class CDModule extends Module {
         }
     }
 
+
+    @Override
+    public void addDataGroup(DataGroup dg, String key){
+
+        if(key=="Positives" || key=="UPositives" || key=="Negatives" || key=="UNegatives"){
+          this.fillFromDir1D(dg, key, "hi_d0");
+          this.fillFromDir1D(dg, key, "hi_vz");
+          this.fillFromDir2D(dg, key, "hi_d0phi");
+          this.fillFromDir2D(dg, key, "hi_vxy");
+          this.fillFromDir2D(dg, key, "hi_vxphi");
+          this.fillFromDir2D(dg, key, "hi_vyphi");
+          this.fillFromDir2D(dg, key, "hi_vzphi");
+        }
+        else System.out.println(key+" DataGroup not added to "+this.getName()+" existing groups");
+    }
+
     
     @Override
     public void writeCCDB(String outputPrefix) {
         try {
-            double Vx=0, Vy=0, E_Vx2=0, E_Vy2=0;
-            int N = vx.size();
-            for(int i=0; i<N; i++) {
-                Vx += 1./N * vx.get(i);
-                Vy += 1./N * vy.get(i);
-                E_Vx2 += 1./(N*N) * (e_vx.get(i)*e_vx.get(i));
-                E_Vy2 += 1./(N*N) * (e_vy.get(i)*e_vy.get(i));
-            }
             System.out.println("Writing to: "+outputPrefix+"_CD_ccdb_table.txt ...");
             PrintWriter wr = new PrintWriter( outputPrefix+"_CD_ccdb_table.txt" );
-            wr.printf( "# x y ex ey\n" );
+            wr.printf( "# x y ex ey only negative tracks in cm\n" );
             wr.printf( "0 0 0 " );
-            wr.printf(  "%.2f %.2f %.2f %.2f\n", Vx, Vy, Math.sqrt(E_Vx2), Math.sqrt(E_Vy2));
+            wr.printf(  "%.3f %.3f %.3f %.3f\n", vxRef, vyRef, e_vxRef, e_vyRef);
+            wr.printf( "# absolute position with respect to an average beam position: %3f %3f \n", xbRef, ybRef);
             wr.close();
         } catch ( IOException e ) {}
     }
