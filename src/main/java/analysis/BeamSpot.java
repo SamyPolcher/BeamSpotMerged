@@ -214,7 +214,7 @@ public class BeamSpot {
         // beam position in cooking
         float  x0             = (float)parser.getOption("-x0").doubleValue();
         float  y0             = (float)parser.getOption("-y0").doubleValue();
-        System.out.printf("test (%2.3f, %2.3f) cm\n", x0, y0);
+        System.out.println("test (" + x0 + "," + y0 + ")\n");
         Event.setAvgBeamPos(x0, y0);
 
         if(!openWindow) System.setProperty("java.awt.headless", "true");
