@@ -483,6 +483,59 @@ public class DCModule  extends Module {
     }
    */
     
+    @Override
+    public EmbeddedCanvasTabbed plotHistos() {
+
+      EmbeddedCanvasTabbed canvas = new EmbeddedCanvasTabbed( "DCVertex" );
+      
+      for( int i=0; i<theta_bins.length-1; i++ ){
+          
+        GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i);
+        H2F h2_z_phi = this.getHistos().get("z_phi").getH2F("z_phi_"+i);
+        String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
+        canvas.addCanvas( cname );
+        EmbeddedCanvas ci = canvas.getCanvas( cname );
+        ci.divide(2,1);
+        ci.cd(0).setAxisTitleSize(18);
+        ci.getPad(0).getAxisZ().setLog(true);
+        ci.draw( h2_z_phi );
+        ci.cd(1).setAxisTitleSize(18);
+        // ci.getPad(1).getAxisY().setAxisMinimum(4);
+        // ci.getPad(1).getAxisY().setAxisMaximum(10);
+
+        ci.draw( g_peak );
+      }
+      
+      GraphErrors gZ = this.getHistos().get("fit_result").getGraph("gZ");
+      GraphErrors gR = this.getHistos().get("fit_result").getGraph("gR");
+      GraphErrors gP = this.getHistos().get("fit_result").getGraph("gP");
+      GraphErrors gX = this.getHistos().get("fit_result").getGraph("gX");
+      GraphErrors gY = this.getHistos().get("fit_result").getGraph("gY");
+      
+      EmbeddedCanvas cp = canvas.getCanvas( "Parameters" );
+      cp.divide(2,3);
+      cp.cd(0).setAxisTitleSize(18);
+      cp.draw( gX );
+      this.zoom(gX, cp.getPad(0).getAxisY());
+      cp.cd(1).setAxisTitleSize(18);
+      cp.draw( gY );
+      this.zoom(gY, cp.getPad(1).getAxisY());
+      cp.cd(2).setAxisTitleSize(18);
+      cp.draw( gZ );
+      this.zoom(gZ, cp.getPad(2).getAxisY());
+      cp.cd(3).setAxisTitleSize(18);
+      cp.draw( gP );
+      this.zoom(gP, cp.getPad(3).getAxisY());
+      cp.cd(4).setAxisTitleSize(18);
+      cp.draw( gR );
+      this.zoom(gR, cp.getPad(4).getAxisY());
+
+      // canvas.setActiveCanvas( "Parameters" );
+        
+      return canvas;
+    }
+
+
     public void plot(boolean write) {
 
       EmbeddedCanvasTabbed czfits = new EmbeddedCanvasTabbed( false );

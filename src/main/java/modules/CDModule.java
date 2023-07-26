@@ -243,6 +243,7 @@ public class CDModule extends Module {
         EmbeddedPad pad = this.getCanvas(name).getCanvasPads().get(4);
         pad.getAxisX().setRange(VXYMIN, VXYMAX);
         pad.getAxisY().setRange(VXYMIN, VXYMAX);
+        // pad.setDimension()
     }
     
 }
