@@ -130,15 +130,15 @@ public class BeamSpot {
     public void saveHistos(String fileName) {
         System.out.println("\n>>>>> Saving histograms to file " + fileName);
         PrintStream pipeStream = new PrintStream(pipeOut);
-        System.setOut(pipeStream);
-        System.setErr(pipeStream);
+        // System.setOut(pipeStream);
+        // System.setErr(pipeStream);
         TDirectory dir = new TDirectory();
         for(Module m : modules) {
             m.writeDataGroup(dir);
         }
         dir.writeFile(fileName);
-        System.setOut(outStream);
-        System.setErr(errStream);
+        // System.setOut(outStream);
+        // System.setErr(errStream);
 	    System.out.println("\n>>>>> "+fileName+" written");	
     }
 
@@ -274,7 +274,7 @@ public class BeamSpot {
             frame.setVisible(true);
             if(printHistos) bs.printHistos();
 	    // needed to print all DC plots in a readable way, needed until I can better figure out how groot works
-            if(runDC) bs.plotDC();
+            // if(runDC) bs.plotDC();
         }
     }
 

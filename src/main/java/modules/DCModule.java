@@ -485,44 +485,30 @@ public class DCModule  extends Module {
     
     @Override
     public void drawHistos() {
-      System.out.println(" CCC ");
+
       EmbeddedCanvasTabbed canvas = new EmbeddedCanvasTabbed( "DCVertex" );
 
-      // zvertex distribution fits in each bin
-      for( int i=0; i<theta_bins.length-1; i++ ){
-        
-        String cname = String.format("fits_%.1f",(theta_bins[i]+theta_bins[i+1])/2);
-        canvas.addCanvas( cname );
-        EmbeddedCanvas ci = canvas.getCanvas( cname );
-        ci.divide(4,5);
-        
-        for( int j=0; j<phi_bins.length-1; j++ ){
-          H1F h = this.getHistos().get("z_slice").getH1F("slice_"+i+"_"+j);
-          ci.cd(j).setAxisTitleSize(18);
-          Func1D func = h.getFunction();
-          if(func != null) {
-              func.setLineColor( 2 );
-              func.setLineWidth( 2 );
-              func.setOptStat(1110);
-          }else System.out.println("fit for z slice " + i + ":" + j + " is empty");
-          ci.setAxisLabelSize(8);
-          ci.setAxisLabelSize(8);
-          ci.setAxisTitleSize(8);
-          ci.setAxisTitleSize(8);
-          ci.getPad(j).getAxisY().setLog(true);
+      // distributions
+      H1F hvz = this.getHistos().get("distribution").getH1F("vz");
+      H1F hphi = this.getHistos().get("distribution").getH1F("phi");
+      H1F hxb = this.getHistos().get("distribution").getH1F("xb");
+      H1F hyb = this.getHistos().get("distribution").getH1F("yb");
 
-          ci.draw( h );
-          
-          if(func != null) {
-              F1D fb = new F1D( "fb"+h.getName(), "[c]+[d]*x", func.getMin(), func.getMax() );
-              fb.setParameter(0, func.getParameter(3) );
-              fb.setParameter(1, func.getParameter(4) );
-              fb.setLineColor(5);
-              fb.setLineWidth(2);
-              ci.draw(fb,"same");
-          }
-        }
-      }
+      canvas.addCanvas( "distributions" );
+      EmbeddedCanvas cdis = canvas.getCanvas( "distributions" );
+      cdis.divide(2,2);
+      cdis.cd(0).setAxisTitleSize(18);
+      cdis.draw( hvz );
+      // this.zoom(vz, cdis.getPad(0).getAxisY());
+      cdis.cd(1).setAxisTitleSize(18);
+      cdis.draw( hphi );
+      // this.zoom(gY, cdis.getPad(1).getAxisY());
+      cdis.cd(2).setAxisTitleSize(18);
+      cdis.draw( hxb );
+      // this.zoom(gZ, cdis.getPad(2).getAxisY());
+      cdis.cd(3).setAxisTitleSize(18);
+      cdis.draw( hyb );
+      // this.zoom(gP, cdis.getPad(3).getAxisY());
 
       // results in each theta bin
       for( int i=0; i<theta_bins.length-1; i++ ){
@@ -569,27 +555,41 @@ public class DCModule  extends Module {
       cp.draw( gR );
       this.zoom(gR, cp.getPad(4).getAxisY());
 
-      // distributions
-      H1F hvz = this.getHistos().get("distribution").getH1F("vz");
-      H1F hphi = this.getHistos().get("distribution").getH1F("phi");
-      H1F hxb = this.getHistos().get("distribution").getH1F("xb");
-      H1F hyb = this.getHistos().get("distribution").getH1F("yb");
+      // zvertex distribution fits in each bin
+      for( int i=0; i<theta_bins.length-1; i++ ){
+        
+        String cname = String.format("fits_%.1f",(theta_bins[i]+theta_bins[i+1])/2);
+        canvas.addCanvas( cname );
+        EmbeddedCanvas ci = canvas.getCanvas( cname );
+        ci.divide(4,5);
+        
+        for( int j=0; j<phi_bins.length-1; j++ ){
+          H1F h = this.getHistos().get("z_slice").getH1F("slice_"+i+"_"+j);
+          ci.cd(j).setAxisTitleSize(18);
+          Func1D func = h.getFunction();
+          if(func != null) {
+              func.setLineColor( 2 );
+              func.setLineWidth( 2 );
+              func.setOptStat(1110);
+          }else System.out.println("fit for z slice " + i + ":" + j + " is empty");
+          ci.setAxisLabelSize(8);
+          ci.setAxisLabelSize(8);
+          ci.setAxisTitleSize(8);
+          ci.setAxisTitleSize(8);
+          ci.getPad(j).getAxisY().setLog(true);
 
-      canvas.addCanvas( "distributions" );
-      EmbeddedCanvas cdis = canvas.getCanvas( "distributions" );
-      cdis.divide(2,2);
-      cdis.cd(0).setAxisTitleSize(18);
-      cdis.draw( hvz );
-      // this.zoom(vz, cdis.getPad(0).getAxisY());
-      cdis.cd(1).setAxisTitleSize(18);
-      cdis.draw( hphi );
-      // this.zoom(gY, cdis.getPad(1).getAxisY());
-      cdis.cd(2).setAxisTitleSize(18);
-      cdis.draw( hxb );
-      // this.zoom(gZ, cdis.getPad(2).getAxisY());
-      cdis.cd(3).setAxisTitleSize(18);
-      cdis.draw( hyb );
-      // this.zoom(gP, cdis.getPad(3).getAxisY());
+          ci.draw( h );
+          
+          if(func != null) {
+              F1D fb = new F1D( "fb"+h.getName(), "[c]+[d]*x", func.getMin(), func.getMax() );
+              fb.setParameter(0, func.getParameter(3) );
+              fb.setParameter(1, func.getParameter(4) );
+              fb.setLineColor(5);
+              fb.setLineWidth(2);
+              ci.draw(fb,"same");
+          }
+        }
+      }
       
       this.setCanvas(canvas);
     }
