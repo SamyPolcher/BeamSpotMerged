@@ -285,6 +285,7 @@ public class Module {
             int nrows = group.getRows();
             int ncols = group.getColumns();
             int nds   = nrows*ncols;
+            System.out.println("\t nds " + nds);
             for(int i = 0; i < nds; i++){
                 List<IDataSet> dsList = group.getData(i);
                 for(IDataSet ds : dsList){
