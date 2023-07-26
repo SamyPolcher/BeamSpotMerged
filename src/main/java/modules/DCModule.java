@@ -485,7 +485,7 @@ public class DCModule  extends Module {
     
     @Override
     public void drawHistos() {
-
+      System.out.println(" CCC ");
       EmbeddedCanvasTabbed canvas = new EmbeddedCanvasTabbed( "DCVertex" );
       
       for( int i=0; i<theta_bins.length-1; i++ ){
