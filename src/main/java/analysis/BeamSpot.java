@@ -130,16 +130,16 @@ public class BeamSpot {
     public void saveHistos(String fileName) {
         System.out.println("\n>>>>> Saving histograms to file " + fileName);
         PrintStream pipeStream = new PrintStream(pipeOut);
-        System.setOut(pipeStream);
-        System.setErr(pipeStream);
+        // System.setOut(pipeStream);
+        // System.setErr(pipeStream);
         TDirectory dir = new TDirectory();
         for(Module m : modules) {
             m.writeDataGroup(dir);
         }
         dir.writeFile(fileName);
-        System.setOut(outStream);
-        System.setErr(errStream);
-	System.out.println("\n>>>>> "+fileName+" written");	
+        // System.setOut(outStream);
+        // System.setErr(errStream);
+	    System.out.println("\n>>>>> "+fileName+" written");	
     }
 
     private void printHistos() {
