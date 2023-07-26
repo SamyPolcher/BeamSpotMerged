@@ -147,7 +147,7 @@ public class Module {
     }
 
 
-    public EmbeddedCanvasTabbed plotHistos() {
+    public final EmbeddedCanvasTabbed plotHistos() {
         this.drawHistos();
         return this.moduleCanvas;
     }
