@@ -97,7 +97,7 @@ public class DCModule  extends Module {
       DataGroup dg_z_slice = new DataGroup(NphiBin, theta_bins.length-1);
       
       // containers for general 1D histograms, z and phi distributions, xb, yb distrib
-      DataGroup dg_distrib = new DataGroup(1, 2);
+      DataGroup dg_distrib = new DataGroup(1, 4);
       
       // containers for for plotting the fits results as a function of theta
       DataGroup dg_fit_results = new DataGroup(1, 5);
