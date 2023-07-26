@@ -512,7 +512,7 @@ public class DCModule  extends Module {
       GraphErrors gX = this.getHistos().get("fit_result").getGraph("gX");
       GraphErrors gY = this.getHistos().get("fit_result").getGraph("gY");
       
-      EmbeddedCanvas cp = canvas.getCanvas( "Parameters" );
+      EmbeddedCanvas cp = canvas.getCanvas( "DCVertex" );
       cp.divide(2,3);
       cp.cd(0).setAxisTitleSize(18);
       cp.draw( gX );
