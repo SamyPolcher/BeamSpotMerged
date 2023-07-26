@@ -486,7 +486,7 @@ public class DCModule  extends Module {
     @Override
     public void drawHistos() {
 
-      EmbeddedCanvasTabbed canvas = new EmbeddedCanvasTabbed( "DCVertex" );
+      EmbeddedCanvasTabbed canvas = new EmbeddedCanvasTabbed( "distributions" );
 
       // distributions
       H1F hvz = this.getHistos().get("distribution").getH1F("vz");
@@ -494,7 +494,6 @@ public class DCModule  extends Module {
       H1F hxb = this.getHistos().get("distribution").getH1F("xb");
       H1F hyb = this.getHistos().get("distribution").getH1F("yb");
 
-      canvas.addCanvas( "distributions" );
       EmbeddedCanvas cdis = canvas.getCanvas( "distributions" );
       cdis.divide(2,2);
       cdis.cd(0).setAxisTitleSize(18);
