@@ -499,35 +499,12 @@ public class DCModule  extends Module {
       cdis.divide(2,2);
       cdis.cd(0).setAxisTitleSize(18);
       cdis.draw( hvz );
-      // this.zoom(vz, cdis.getPad(0).getAxisY());
       cdis.cd(1).setAxisTitleSize(18);
       cdis.draw( hphi );
-      // this.zoom(gY, cdis.getPad(1).getAxisY());
       cdis.cd(2).setAxisTitleSize(18);
       cdis.draw( hxb );
-      // this.zoom(gZ, cdis.getPad(2).getAxisY());
       cdis.cd(3).setAxisTitleSize(18);
       cdis.draw( hyb );
-      // this.zoom(gP, cdis.getPad(3).getAxisY());
-
-      // results in each theta bin
-      for( int i=0; i<theta_bins.length-1; i++ ){
-          
-        GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i);
-        H2F h2_z_phi = this.getHistos().get("z_phi").getH2F("z_phi_"+i);
-        String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
-        canvas.addCanvas( cname );
-        EmbeddedCanvas ci = canvas.getCanvas( cname );
-        ci.divide(2,1);
-        ci.cd(0).setAxisTitleSize(18);
-        ci.getPad(0).getAxisZ().setLog(true);
-        ci.draw( h2_z_phi );
-        ci.cd(1).setAxisTitleSize(18);
-        // ci.getPad(1).getAxisY().setAxisMinimum(4);
-        // ci.getPad(1).getAxisY().setAxisMaximum(10);
-
-        ci.draw( g_peak );
-      }
       
       // final results on all bins
       GraphErrors gZ = this.getHistos().get("fit_result").getGraph("gZ");
@@ -555,6 +532,25 @@ public class DCModule  extends Module {
       cp.draw( gR );
       this.zoom(gR, cp.getPad(4).getAxisY());
 
+      // results in each theta bin
+      for( int i=0; i<theta_bins.length-1; i++ ){
+          
+        GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i);
+        H2F h2_z_phi = this.getHistos().get("z_phi").getH2F("z_phi_"+i);
+        String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
+        canvas.addCanvas( cname );
+        EmbeddedCanvas ci = canvas.getCanvas( cname );
+        ci.divide(2,1);
+        ci.cd(0).setAxisTitleSize(18);
+        ci.getPad(0).getAxisZ().setLog(true);
+        ci.draw( h2_z_phi );
+        ci.cd(1).setAxisTitleSize(18);
+        // ci.getPad(1).getAxisY().setAxisMinimum(4);
+        // ci.getPad(1).getAxisY().setAxisMaximum(10);
+
+        ci.draw( g_peak );
+      }
+
       // zvertex distribution fits in each bin
       for( int i=0; i<theta_bins.length-1; i++ ){
         
@@ -571,7 +567,7 @@ public class DCModule  extends Module {
               func.setLineColor( 2 );
               func.setLineWidth( 2 );
               func.setOptStat(1110);
-          }else System.out.println("fit for z slice " + i + ":" + j + " is empty");
+          } // else System.out.println("fit for z slice " + i + ":" + j + " is empty");
           ci.setAxisLabelSize(8);
           ci.setAxisLabelSize(8);
           ci.setAxisTitleSize(8);
@@ -590,7 +586,7 @@ public class DCModule  extends Module {
           }
         }
       }
-      
+      canvas.setActiveCanvas( "parameters" );
       this.setCanvas(canvas);
     }
 
