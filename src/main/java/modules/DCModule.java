@@ -469,20 +469,6 @@ public class DCModule  extends Module {
         else return true;
     }
     
-   /*
-   @Override
-    public void setPlottingOptions(String name) {
-        this.getCanvas(name).setGridX(false);
-        this.getCanvas(name).setGridY(false);
-        this.setLogZ(name);
-        double VXYMIN = -1.0;
-        double VXYMAX =  1.0;
-        EmbeddedPad pad = this.getCanvas(name).getCanvasPads().get(4);
-        pad.getAxisX().setRange(VXYMIN, VXYMAX);
-        pad.getAxisY().setRange(VXYMIN, VXYMAX);
-    }
-   */
-    
     @Override
     public void drawHistos() {
 
@@ -544,9 +530,6 @@ public class DCModule  extends Module {
         ci.getPad(0).getAxisZ().setLog(true);
         ci.draw( h2_z_phi );
         ci.cd(1).setAxisTitleSize(18);
-        // ci.getPad(1).getAxisY().setAxisMinimum(4);
-        // ci.getPad(1).getAxisY().setAxisMaximum(10);
-
         ci.draw( g_peak );
       }
 
@@ -590,113 +573,113 @@ public class DCModule  extends Module {
     }
 
 
-    public void plot(boolean write) {
+    // public void plot(boolean write) {
 
-      EmbeddedCanvasTabbed czfits = new EmbeddedCanvasTabbed( false );
+    //   EmbeddedCanvasTabbed czfits = new EmbeddedCanvasTabbed( false );
       
-      for( int i=0; i<theta_bins.length-1; i++ ){
+    //   for( int i=0; i<theta_bins.length-1; i++ ){
         
-        String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
-        czfits.addCanvas( cname );
-        EmbeddedCanvas ci = czfits.getCanvas( cname );
-        ci.divide(4,5);
+    //     String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
+    //     czfits.addCanvas( cname );
+    //     EmbeddedCanvas ci = czfits.getCanvas( cname );
+    //     ci.divide(4,5);
         
-        for( int j=0; j<phi_bins.length-1; j++ ){
-          H1F h = this.getHistos().get("z_slice").getH1F("slice_"+i+"_"+j);
-          ci.cd(j).setAxisTitleSize(18);
-          Func1D func = h.getFunction();
-          if(func != null) {
-              func.setLineColor( 2 );
-              func.setLineWidth( 2 );
-              func.setOptStat(1110);
-          }else System.out.println("fit for z slice " + i + ":" + j + " is empty");
-          ci.setAxisLabelSize(8);
-          ci.setAxisLabelSize(8);
-          ci.setAxisTitleSize(8);
-          ci.setAxisTitleSize(8);
-          ci.getPad(j).getAxisY().setLog(true);
+    //     for( int j=0; j<phi_bins.length-1; j++ ){
+    //       H1F h = this.getHistos().get("z_slice").getH1F("slice_"+i+"_"+j);
+    //       ci.cd(j).setAxisTitleSize(18);
+    //       Func1D func = h.getFunction();
+    //       if(func != null) {
+    //           func.setLineColor( 2 );
+    //           func.setLineWidth( 2 );
+    //           func.setOptStat(1110);
+    //       }else System.out.println("fit for z slice " + i + ":" + j + " is empty");
+    //       ci.setAxisLabelSize(8);
+    //       ci.setAxisLabelSize(8);
+    //       ci.setAxisTitleSize(8);
+    //       ci.setAxisTitleSize(8);
+    //       ci.getPad(j).getAxisY().setLog(true);
 
-          ci.draw( h );
+    //       ci.draw( h );
           
-          if(func != null) {
-              F1D fb = new F1D( "fb"+h.getName(), "[c]+[d]*x", func.getMin(), func.getMax() );
-              fb.setParameter(0, func.getParameter(3) );
-              fb.setParameter(1, func.getParameter(4) );
-              fb.setLineColor(5);
-              fb.setLineWidth(2);
-              ci.draw(fb,"same");
-          }
-        }
-      }
+    //       if(func != null) {
+    //           F1D fb = new F1D( "fb"+h.getName(), "[c]+[d]*x", func.getMin(), func.getMax() );
+    //           fb.setParameter(0, func.getParameter(3) );
+    //           fb.setParameter(1, func.getParameter(4) );
+    //           fb.setLineColor(5);
+    //           fb.setLineWidth(2);
+    //           ci.draw(fb,"same");
+    //       }
+    //     }
+    //   }
 
-      JFrame czframe = new JFrame("Beam Spot - Gaussian Fits");
-      czframe.add(czfits);
-      czframe.pack();
-      czframe.setMinimumSize( new Dimension( 1400,904 ) );
-      czframe.setVisible(true);
+    //   JFrame czframe = new JFrame("Beam Spot - Gaussian Fits");
+    //   czframe.add(czfits);
+    //   czframe.pack();
+    //   czframe.setMinimumSize( new Dimension( 1400,904 ) );
+    //   czframe.setVisible(true);
 
-      EmbeddedCanvasTabbed canvas = new EmbeddedCanvasTabbed( "Parameters" );
+    //   EmbeddedCanvasTabbed canvas = new EmbeddedCanvasTabbed( "Parameters" );
       
-      for( int i=0; i<theta_bins.length-1; i++ ){
+    //   for( int i=0; i<theta_bins.length-1; i++ ){
           
-        GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i);
-        H2F h2_z_phi = this.getHistos().get("z_phi").getH2F("z_phi_"+i);
-        String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
-        canvas.addCanvas( cname );
-        EmbeddedCanvas ci = canvas.getCanvas( cname );
-        ci.divide(2,1);
-        ci.cd(0).setAxisTitleSize(18);
-        ci.getPad(0).getAxisZ().setLog(true);
-        ci.draw( h2_z_phi );
-        ci.cd(1).setAxisTitleSize(18);
-        // ci.getPad(1).getAxisY().setAxisMinimum(4);
-        // ci.getPad(1).getAxisY().setAxisMaximum(10);
+    //     GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i);
+    //     H2F h2_z_phi = this.getHistos().get("z_phi").getH2F("z_phi_"+i);
+    //     String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
+    //     canvas.addCanvas( cname );
+    //     EmbeddedCanvas ci = canvas.getCanvas( cname );
+    //     ci.divide(2,1);
+    //     ci.cd(0).setAxisTitleSize(18);
+    //     ci.getPad(0).getAxisZ().setLog(true);
+    //     ci.draw( h2_z_phi );
+    //     ci.cd(1).setAxisTitleSize(18);
+    //     // ci.getPad(1).getAxisY().setAxisMinimum(4);
+    //     // ci.getPad(1).getAxisY().setAxisMaximum(10);
 
-        ci.draw( g_peak );
-      }
+    //     ci.draw( g_peak );
+    //   }
       
-      GraphErrors gZ = this.getHistos().get("fit_result").getGraph("gZ");
-      GraphErrors gR = this.getHistos().get("fit_result").getGraph("gR");
-      GraphErrors gP = this.getHistos().get("fit_result").getGraph("gP");
-      GraphErrors gX = this.getHistos().get("fit_result").getGraph("gX");
-      GraphErrors gY = this.getHistos().get("fit_result").getGraph("gY");
+    //   GraphErrors gZ = this.getHistos().get("fit_result").getGraph("gZ");
+    //   GraphErrors gR = this.getHistos().get("fit_result").getGraph("gR");
+    //   GraphErrors gP = this.getHistos().get("fit_result").getGraph("gP");
+    //   GraphErrors gX = this.getHistos().get("fit_result").getGraph("gX");
+    //   GraphErrors gY = this.getHistos().get("fit_result").getGraph("gY");
       
-      EmbeddedCanvas cp = canvas.getCanvas( "Parameters" );
-      cp.divide(2,3);
-      cp.cd(0).setAxisTitleSize(18);
-      cp.draw( gX );
-      this.zoom(gX, cp.getPad(0).getAxisY());
-      cp.cd(1).setAxisTitleSize(18);
-      cp.draw( gY );
-      this.zoom(gY, cp.getPad(1).getAxisY());
-      cp.cd(2).setAxisTitleSize(18);
-      cp.draw( gZ );
-      this.zoom(gZ, cp.getPad(2).getAxisY());
-      cp.cd(3).setAxisTitleSize(18);
-      cp.draw( gP );
-      this.zoom(gP, cp.getPad(3).getAxisY());
-      cp.cd(4).setAxisTitleSize(18);
-      cp.draw( gR );
-      this.zoom(gR, cp.getPad(4).getAxisY());
+    //   EmbeddedCanvas cp = canvas.getCanvas( "Parameters" );
+    //   cp.divide(2,3);
+    //   cp.cd(0).setAxisTitleSize(18);
+    //   cp.draw( gX );
+    //   this.zoom(gX, cp.getPad(0).getAxisY());
+    //   cp.cd(1).setAxisTitleSize(18);
+    //   cp.draw( gY );
+    //   this.zoom(gY, cp.getPad(1).getAxisY());
+    //   cp.cd(2).setAxisTitleSize(18);
+    //   cp.draw( gZ );
+    //   this.zoom(gZ, cp.getPad(2).getAxisY());
+    //   cp.cd(3).setAxisTitleSize(18);
+    //   cp.draw( gP );
+    //   this.zoom(gP, cp.getPad(3).getAxisY());
+    //   cp.cd(4).setAxisTitleSize(18);
+    //   cp.draw( gR );
+    //   this.zoom(gR, cp.getPad(4).getAxisY());
 
-      canvas.setActiveCanvas( "Parameters" );
+    //   canvas.setActiveCanvas( "Parameters" );
 
-      JFrame frame = new JFrame("BeamSpot - Modulation Fits");
-      frame.add(canvas);
-      frame.pack();
-      frame.setMinimumSize( new Dimension( 800, 700 ) );
-      frame.setVisible(true);
+    //   JFrame frame = new JFrame("BeamSpot - Modulation Fits");
+    //   frame.add(canvas);
+    //   frame.pack();
+    //   frame.setMinimumSize( new Dimension( 800, 700 ) );
+    //   frame.setVisible(true);
 
-      // save plots as png files
-      if (write){
-        for( int i=0; i<theta_bins.length-1; i++ ){
-          String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
-          EmbeddedCanvas ci = canvas.getCanvas( cname );
-          ci.save( "DC_bin"+i+".png");
-        }
-        cp.save("DC_results.png");
-      }
-    }
+    //   // save plots as png files
+    //   if (write){
+    //     for( int i=0; i<theta_bins.length-1; i++ ){
+    //       String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
+    //       EmbeddedCanvas ci = canvas.getCanvas( cname );
+    //       ci.save( "DC_bin"+i+".png");
+    //     }
+    //     cp.save("DC_results.png");
+    //   }
+    // }
     
     @Override
     public void writeCCDB(String outputPrefix) {

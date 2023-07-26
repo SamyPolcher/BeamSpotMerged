@@ -106,9 +106,9 @@ public class BeamSpot {
         return panel;
     }
     
-    public void plotDC() {
-        modules.get(1).plot(true);
-    }
+    // public void plotDC() {
+    //     modules.get(1).plot(true);
+    // }
     
     public void readHistos(String fileName) {
         System.out.println("Opening file: " + fileName);
