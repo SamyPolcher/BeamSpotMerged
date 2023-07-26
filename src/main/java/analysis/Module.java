@@ -107,6 +107,10 @@ public class Module {
     public EmbeddedCanvasTabbed getCanvas() {
         return moduleCanvas;
     }
+
+    public void setCanvas(EmbeddedCanvasTabbed canvas) {
+        moduleCanvas = canvas;
+    }
     
     public EmbeddedCanvas getCanvas(String name) {
         return moduleCanvas.getCanvas(name);
