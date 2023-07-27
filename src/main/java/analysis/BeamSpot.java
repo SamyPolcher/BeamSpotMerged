@@ -173,8 +173,8 @@ public class BeamSpot {
         parser.addOption("-X"          ,"0",    "do NOT save histograms in a hipo file");
         parser.addOption("-CD"         ,"1",    "set to 0 to deactivate CD beamspot analysis");
         parser.addOption("-DC"         ,"1",    "set to 0 to deactivate DC beamspot analysis");
-        parser.addOption("-x0"         ,"0",    "x position of the beam used in cooking (average raster position if raster is used)");
-        parser.addOption("-y0"         ,"0",    "y position of the beam used in cooking (average raster position if raster is used)");
+        parser.addOption("-x0"         ,"0",    "x position of the beam used in the reconstruction (average raster position if raster is used)");
+        parser.addOption("-y0"         ,"0",    "y position of the beam used in the reconstruction (average raster position if raster is used)");
 
         // histogram settings
         parser.addOption("-histo"      ,"0",    "read histogram from hipo file (0/1)");
