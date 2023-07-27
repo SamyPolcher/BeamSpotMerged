@@ -46,7 +46,7 @@ public class CDModule extends Module {
     Double ybRef = 0.;
     
     public CDModule() {
-        super("CDVertex_");
+        super("CDVertex");
     }
     
     public DataGroup createVertexGroup(int col) {
