@@ -271,9 +271,10 @@ public class BeamSpot {
             frame.setSize(1400, 900);
             frame.add(bs.plotHistos());
             frame.setLocationRelativeTo(null);
+            frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
             frame.setVisible(true);
             if(printHistos) bs.printHistos();
-	    // needed to print all DC plots in a readable way, needed until I can better figure out how groot works
+	        // needed to print all DC plots in a readable way, needed until I can better figure out how groot works
             // if(runDC) bs.plotDC();
         }
     }

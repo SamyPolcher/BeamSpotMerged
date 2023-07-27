@@ -472,7 +472,8 @@ public class DCModule  extends Module {
     @Override
     public void drawHistos() {
 
-      EmbeddedCanvasTabbed canvas = new EmbeddedCanvasTabbed( "distributions" );
+      // EmbeddedCanvasTabbed canvas = new EmbeddedCanvasTabbed( "distributions" );
+      EmbeddedCanvasTabbed canvas = this.getCanvas();
 
       // distributions
       H1F hvz = this.getHistos().get("distribution").getH1F("vz");
@@ -480,7 +481,9 @@ public class DCModule  extends Module {
       H1F hxb = this.getHistos().get("distribution").getH1F("xb");
       H1F hyb = this.getHistos().get("distribution").getH1F("yb");
 
+      this.addCanvas( "distributions" );
       EmbeddedCanvas cdis = canvas.getCanvas( "distributions" );
+
       cdis.divide(2,2);
       cdis.cd(0).setAxisTitleSize(18);
       cdis.draw( hvz );
@@ -498,8 +501,9 @@ public class DCModule  extends Module {
       GraphErrors gX = this.getHistos().get("fit_result").getGraph("gX");
       GraphErrors gY = this.getHistos().get("fit_result").getGraph("gY");
 
-      canvas.addCanvas( "parameters" );
+      this.addCanvas( "parameters" );
       EmbeddedCanvas cp = canvas.getCanvas( "parameters" );
+
       cp.divide(2,3);
       cp.cd(0).setAxisTitleSize(18);
       cp.draw( gX );
@@ -523,7 +527,7 @@ public class DCModule  extends Module {
         GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i);
         H2F h2_z_phi = this.getHistos().get("z_phi").getH2F("z_phi_"+i);
         String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
-        canvas.addCanvas( cname );
+        this.addCanvas( cname );
         EmbeddedCanvas ci = canvas.getCanvas( cname );
         ci.divide(2,1);
         ci.cd(0).setAxisTitleSize(18);
@@ -537,7 +541,7 @@ public class DCModule  extends Module {
       for( int i=0; i<theta_bins.length-1; i++ ){
         
         String cname = String.format("fits_%.1f",(theta_bins[i]+theta_bins[i+1])/2);
-        canvas.addCanvas( cname );
+        this.addCanvas( cname );
         EmbeddedCanvas ci = canvas.getCanvas( cname );
         ci.divide(4,5);
         
@@ -569,7 +573,7 @@ public class DCModule  extends Module {
         }
       }
       canvas.setActiveCanvas( "parameters" );
-      this.setCanvas(canvas);
+      // this.setCanvas(canvas);
     }
 
 
