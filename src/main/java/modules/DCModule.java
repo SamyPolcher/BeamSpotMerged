@@ -473,7 +473,7 @@ public class DCModule  extends Module {
     public void drawHistos() {
 
       // EmbeddedCanvasTabbed canvas = new EmbeddedCanvasTabbed( "distributions" );
-      EmbeddedCanvasTabbed canvas = this.getCanvas();
+      // EmbeddedCanvasTabbed canvas = this.getCanvas();
 
       // distributions
       H1F hvz = this.getHistos().get("distribution").getH1F("vz");
@@ -482,7 +482,7 @@ public class DCModule  extends Module {
       H1F hyb = this.getHistos().get("distribution").getH1F("yb");
 
       this.addCanvas( "distributions" );
-      EmbeddedCanvas cdis = canvas.getCanvas( "distributions" );
+      EmbeddedCanvas cdis = this.getCanvas().getCanvas( "distributions" );
 
       cdis.divide(2,2);
       cdis.cd(0).setAxisTitleSize(18);
@@ -502,7 +502,7 @@ public class DCModule  extends Module {
       GraphErrors gY = this.getHistos().get("fit_result").getGraph("gY");
 
       this.addCanvas( "parameters" );
-      EmbeddedCanvas cp = canvas.getCanvas( "parameters" );
+      EmbeddedCanvas cp = this.getCanvas().getCanvas( "parameters" );
 
       cp.divide(2,3);
       cp.cd(0).setAxisTitleSize(18);
@@ -528,7 +528,7 @@ public class DCModule  extends Module {
         H2F h2_z_phi = this.getHistos().get("z_phi").getH2F("z_phi_"+i);
         String cname = String.format("%.1f",(theta_bins[i]+theta_bins[i+1])/2);
         this.addCanvas( cname );
-        EmbeddedCanvas ci = canvas.getCanvas( cname );
+        EmbeddedCanvas ci = this.getCanvas().getCanvas( cname );
         ci.divide(2,1);
         ci.cd(0).setAxisTitleSize(18);
         ci.getPad(0).getAxisZ().setLog(true);
@@ -542,7 +542,7 @@ public class DCModule  extends Module {
         
         String cname = String.format("fits_%.1f",(theta_bins[i]+theta_bins[i+1])/2);
         this.addCanvas( cname );
-        EmbeddedCanvas ci = canvas.getCanvas( cname );
+        EmbeddedCanvas ci = this.getCanvas().getCanvas( cname );
         ci.divide(4,5);
         
         for( int j=0; j<phi_bins.length-1; j++ ){
@@ -572,7 +572,7 @@ public class DCModule  extends Module {
           }
         }
       }
-      canvas.setActiveCanvas( "parameters" );
+      this.getCanvas().setActiveCanvas( "parameters" );
       // this.setCanvas(canvas);
     }
 
