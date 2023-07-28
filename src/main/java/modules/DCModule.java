@@ -97,7 +97,7 @@ public class DCModule  extends Module {
       DataGroup dg_z_slice = new DataGroup(NphiBin, theta_bins.length-1);
       
       // containers for general 1D histograms, z and phi distributions, xb, yb distrib
-      DataGroup dg_distrib = new DataGroup(1, 4);
+      DataGroup dg_distrib = new DataGroup(1, 5);
       
       // containers for for plotting the fits results as a function of theta
       DataGroup dg_fit_results = new DataGroup(1, 5);
@@ -106,6 +106,7 @@ public class DCModule  extends Module {
       H1F h1_phi = new H1F( "phi", "phi distribution", 180, -30, 330 );   dg_distrib.addDataSet(h1_phi, 1);
       H1F h1_xb  = histo1D("xb", "xb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 2);
       H1F h1_yb  = histo1D("yb", "yb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 3);
+      H1F h1_theta  = histo1D("theta", "theta (deg)", "Counts", 1000, -100, 100, 43);  dg_distrib.addDataSet(h1_theta, 4);
         
       // graphs for plotting the results as a function of theta
       GraphErrors gZ = new GraphErrors("gZ");  // Z 
@@ -186,7 +187,8 @@ public class DCModule  extends Module {
               if( phi > 330) phi -= 360.0; // pop the split sector back together
 
               float theta = (float) Math.toDegrees( Math.atan2( Math.sqrt( track.px()*track.px() + track.py()*track.py()), track.pz() ) );
-              
+              this.getHistos().get("distribution").getH1F("theta").fill(theta);
+
               // find theta/phi bin
               int thetaBin = Arrays.binarySearch( theta_bins, theta );
               thetaBin = -thetaBin -2;
@@ -479,7 +481,7 @@ public class DCModule  extends Module {
       H1F hvz = this.getHistos().get("distribution").getH1F("vz");
       H1F hphi = this.getHistos().get("distribution").getH1F("phi");
       H1F hxb = this.getHistos().get("distribution").getH1F("xb");
-      H1F hyb = this.getHistos().get("distribution").getH1F("yb");
+      H1F hyb = this.getHistos().get("distribution").getH1F("theta");
 
       this.addCanvas( "distributions" );
       EmbeddedCanvas cdis = this.getCanvas().getCanvas( "distributions" );

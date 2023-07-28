@@ -102,7 +102,7 @@ public class Track extends Particle {
         float x0 = bank.getFloat("xb", row);
         float y0 = bank.getFloat("yb", row);
 
-        Track t = new Track(211*charge, //I think that it's because CVTRec pid is not reliable
+        Track t = new Track(211*charge,
             pt*Math.cos(phi0),
             pt*Math.sin(phi0),
             pt*tandip,

@@ -154,7 +154,7 @@ public class Event {
     
     private void readFDTracks(DataEvent event) {
         DataBank recPart   = this.getBank(event, "REC::Particle");
-        DataBank recTrack  = this.getBank(event, "REC::UTrack");
+        DataBank recTrack  = this.getBank(event, "REC::Track");
         DataBank runConfig = this.getBank(event, "RUN::config");
         DataBank rasterPos = this.getBank(event, "RASTER::position");
        
