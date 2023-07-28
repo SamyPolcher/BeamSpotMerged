@@ -481,7 +481,7 @@ public class DCModule  extends Module {
       H1F hvz = this.getHistos().get("distribution").getH1F("vz");
       H1F hphi = this.getHistos().get("distribution").getH1F("phi");
       H1F hxb = this.getHistos().get("distribution").getH1F("xb");
-      H1F hyb = this.getHistos().get("distribution").getH1F("theta");
+      H1F hyb = this.getHistos().get("distribution").getH1F("yb");
 
       this.addCanvas( "distributions" );
       EmbeddedCanvas cdis = this.getCanvas().getCanvas( "distributions" );
