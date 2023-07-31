@@ -102,7 +102,7 @@ Drift Chambers
 Absolute beamspot x: (0.187 +/- 0.023) cm, y: (0.046 +/- 0.024) cm
   with respect to average beam position: (0.000, 0.015) cm
 ```
-![[CDVertex_UNegatives.png]]
+![CDVertex_UNegatives.png](CDVertex_UNegatives.png)
 CD: Plots in the central detector (unconstrained negative tracks)
 
 ![[DCVertex_17.5.png]]
