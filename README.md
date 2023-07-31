@@ -108,7 +108,7 @@ CD: Plots in the central detector (unconstrained negative tracks)
 
 ![CDVertex_UNegatives](./DCVertex_175.png)
 
-![DCVertex_175](./DCVertex_175.png)
+![DCVertex](./DCVertex_175.png)
 DC: Modulation fit in one $\theta$ bin
 
 ![DCVertex_fits_175](./DCVertex_fits_175.png)
