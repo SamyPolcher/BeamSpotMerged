@@ -158,10 +158,6 @@ public class CDModule extends Module {
                                       Math.pow(f1.getParameter(0)*Math.sin(f1.getParameter(2))*f1.parameter(2).error(),2));
             double edy = Math.sqrt(Math.pow(f1.parameter(0).error()*Math.sin(f1.getParameter(2)),2)+
                                       Math.pow(f1.getParameter(0)*Math.cos(f1.getParameter(2))*f1.parameter(2).error(),2));
-            System.out.printf("x_offset: (%2.3f +/- %2.3f) cm, y_offset: (%2.3f +/- %2.3f) cm\n", dx, edx, dy, edy);
-            System.out.printf("  with respect to average beam position: (%2.3f, %2.3f) cm\n", xb, yb);      
-            System.out.printf("Update the beam (x,y) position to: (%2.3f, %2.3f) cm\n", xb+dx, yb+dy);       
-            System.out.printf("or shift the detector position by: (%2.3f, %2.3f) cm\n", -dx, -dy);
 
             if(name == "UNegatives"){
                 vxRef = xb+dx; vyRef = yb+dy;
@@ -212,6 +208,8 @@ public class CDModule extends Module {
         if(key=="Positives" || key=="UPositives" || key=="Negatives" || key=="UNegatives"){
           this.fillFromDir1D(dg, key, "hi_d0");
           this.fillFromDir1D(dg, key, "hi_vz");
+          this.fillFromDir1D(dg, key, "hi_xb");
+          this.fillFromDir1D(dg, key, "hi_yb");
           this.fillFromDir2D(dg, key, "hi_d0phi");
           this.fillFromDir2D(dg, key, "hi_vxy");
           this.fillFromDir2D(dg, key, "hi_vxphi");
@@ -232,6 +230,11 @@ public class CDModule extends Module {
             wr.printf(  "%.3f %.3f %.3f %.3f\n", vxRef, vyRef, e_vxRef, e_vyRef);
             wr.printf( "# absolute position with respect to an average beam position: %3f %3f \n", xbRef, ybRef);
             wr.close();
+
+            System.out.printf("\nCentral Detector\n");
+            System.out.printf("Absolute beamspot x: (%2.3f +/- %2.3f) cm, y: (%2.3f +/- %2.3f) cm\n", vxRef, e_vxRef, vyRef, e_vyRef);
+            System.out.printf("  with respect to average beam position: (%2.3f, %2.3f) cm\n", xbRef, ybRef);
+
         } catch ( IOException e ) {}
     }
 

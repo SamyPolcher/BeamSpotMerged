@@ -602,6 +602,10 @@ public class DCModule  extends Module {
             wr.printf( "# absolute position with respect to an average beam position: %3f %3f \n", xb, yb);
             wr.close();
             System.out.println(wr);
+
+            System.out.printf("\nDrift Chambers\n");
+            System.out.printf("Absolute beamspot x: (%2.3f +/- %2.3f) cm, y: (%2.3f +/- %2.3f) cm\n", xb+vx, e_vx, yb+vy, e_vy);
+            System.out.printf("  with respect to average beam position: (%2.3f, %2.3f) cm\n", xb, yb);
         } catch ( IOException e ) {}
     }
 }
