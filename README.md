@@ -105,10 +105,10 @@ Absolute beamspot x: (0.187 +/- 0.023) cm, y: (0.046 +/- 0.024) cm
 ![CDVertex_UNegatives](CDVertex_UNegatives.png)
 CD: Plots in the central detector (unconstrained negative tracks)
 
-![DCVertex_17.5](DCVertex_175.png)
+![DCVertex_175](DCVertex_175.png)
 DC: Modulation fit in one $\theta$ bin
 
-![DCVertex_fits_17.5](DCVertex_fits_175.png)
+![DCVertex_fits_175](DCVertex_fits_175.png)
 DC: In one $\theta$ bin, target window fits for the all phi bins
 
 ![DCVertex_parameters](DCVertex_parameters.png)
