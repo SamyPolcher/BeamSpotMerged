@@ -105,13 +105,13 @@ Absolute beamspot x: (0.187 +/- 0.023) cm, y: (0.046 +/- 0.024) cm
 ![CDVertex_UNegatives.png](CDVertex_UNegatives.png)
 CD: Plots in the central detector (unconstrained negative tracks)
 
-![[DCVertex_17.5.png]]
+![DCVertex_17.5.png](DCVertex_17.5.png)
 DC: Modulation fit in one $\theta$ bin
 
-![[DCVertex_fits_17.5.png]]
+![DCVertex_fits_17.5.png](DCVertex_fits_17.5.png)
 DC: In one $\theta$ bin, target window fits for the all phi bins
 
-![[DCVertex_parameters.png]]
+![DCVertex_parameters.png](DCVertex_parameters.png)
 DC: Modulation fit parameters and beam spot extracted for all theta bins 
 
 To do a run by run analysis the code can be run in batch jobs with a different prefix for each job (run number for example).
