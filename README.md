@@ -107,6 +107,7 @@ Absolute beamspot x: (0.187 +/- 0.023) cm, y: (0.046 +/- 0.024) cm
 CD: Plots in the central detector (unconstrained negative tracks)
 
 ![DCVertex](./DCVertex_175.png)
+DC: Modulation fit in one theta bin
 
 ![DCVertex](./DCVertex_175.png)
 DC: Modulation fit in one $\theta$ bin
