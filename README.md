@@ -1,5 +1,4 @@
-
-Analysis of the beam position.
+# Beam Position Code
 
 This code was built merging two beam spot codes from the CVT (CD) and DC :
 - CVTMonitoring, author Raffaella De Vita (github link ?)
