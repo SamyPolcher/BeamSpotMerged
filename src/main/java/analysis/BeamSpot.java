@@ -258,7 +258,10 @@ public class BeamSpot {
                 }
                 progress.showStatus();
                 reader.close();
-            }    
+                if(maxEvents>0){
+                    if(counter>=maxEvents) break;
+                }
+            }   
             bs.analyzeHistos();
             if(saveHistos) bs.saveHistos(histoName);
         }
