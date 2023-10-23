@@ -29,6 +29,16 @@ public class Track extends Particle {
     private int sector=0;
     private int NDF;
     private double solenoid = -1;
+
+    // For DC tracks, line equation of the line extrapolation of the track to the vertex
+    // ox, oy, oz, is the point in REC::Traj of smallest z
+    // cx, cy, cy cosine of the track at that point
+    private float ox = 0;
+    private float oy = 0;
+    private float oz = 0;
+    private float cx = 0;
+    private float cy = 0;
+    private float cz = 0;
     
     
     Track(int pid, double px, double py, double pz, double vx, double vy, double vz) {
@@ -133,6 +143,51 @@ public class Track extends Particle {
 
     public float yb(){
         return this.yb;
+    }
+
+    public void addTraj(DataBank traj, int pindex){
+        float minz = 9999;
+        for (int i = 0; i < traj.rows(); i++) {
+            
+            int rowpindex = traj.getInt("pindex", i);
+            if(rowpindex != pindex){ continue;}
+            float rowz = traj.getFloat("z", i);
+
+            if( rowz < minz ){
+                minz = rowz;
+                ox = traj.getFloat("x", i);
+                oy = traj.getFloat("y", i);
+                oz = rowz;
+
+                cx = traj.getFloat("cx", i);
+                cy = traj.getFloat("cy", i);
+                cz = traj.getFloat("cz", i);
+            }
+        }
+    }
+
+    public float ox(){
+        return this.ox;
+    }
+
+    public float oy(){
+        return this.oy;
+    }
+
+    public float oz(){
+        return this.oz;
+    }
+
+    public float cx(){
+        return this.cx;
+    }
+
+    public float cy(){
+        return this.cy;
+    }
+
+    public float cz(){
+        return this.cz;
     }
 
     public int getNDF() {

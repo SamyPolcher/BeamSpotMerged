@@ -8,6 +8,7 @@ import java.util.Arrays;
 import java.util.List;
 import javax.swing.JFrame;
 import java.awt.Dimension;
+import java.util.Vector;
 
 import org.jlab.clas.physics.PhysicsEvent;
 import org.jlab.io.base.DataBank;
@@ -49,6 +50,16 @@ public class DCModule  extends Module {
     double[] theta_bins;
     double[] phi_bins;
     double[] z_bins;
+
+    // vectors to keep the track line equation + raster position
+    Vector<Float> ox = new Vector();
+    Vector<Float> oy = new Vector();
+    Vector<Float> oz = new Vector();
+    Vector<Float> cx = new Vector();
+    Vector<Float> cy = new Vector();
+    Vector<Float> cz = new Vector();
+    Vector<Float> xraster = new Vector();
+    Vector<Float> yraster = new Vector();
 
     // 
     // ----------------------------------------- 
@@ -97,7 +108,7 @@ public class DCModule  extends Module {
       DataGroup dg_z_slice = new DataGroup(NphiBin, theta_bins.length-1);
       
       // containers for general 1D histograms, z and phi distributions, xb, yb distrib
-      DataGroup dg_distrib = new DataGroup(1, 5);
+      DataGroup dg_distrib = new DataGroup(1, 7);
       
       // containers for for plotting the fits results as a function of theta
       DataGroup dg_fit_results = new DataGroup(1, 5);
@@ -106,7 +117,9 @@ public class DCModule  extends Module {
       H1F h1_phi = new H1F( "phi", "phi distribution", 180, -30, 330 );   dg_distrib.addDataSet(h1_phi, 1);
       H1F h1_xb  = histo1D("xb", "xb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 2);
       H1F h1_yb  = histo1D("yb", "yb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 3);
-      H1F h1_theta  = histo1D("theta", "theta (deg)", "Counts", 1000, -100, 100, 43);  dg_distrib.addDataSet(h1_theta, 4);
+      H1F h1_xb00  = histo1D("xb00", "xb00 (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 4);
+      H1F h1_yb00  = histo1D("yb00", "yb00 (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 5);
+      H1F h1_theta  = histo1D("theta", "theta (deg)", "Counts", 1000, -100, 100, 43);  dg_distrib.addDataSet(h1_theta, 6);
         
       // graphs for plotting the results as a function of theta
       GraphErrors gZ = new GraphErrors("gZ");  // Z 
@@ -206,6 +219,11 @@ public class DCModule  extends Module {
 
               this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(track.vz(), phi);
               this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(track.vz());
+
+              ox.add(track.ox()); oy.add(track.oy()); oz.add(track.oz());
+              cx.add(track.cx()); cy.add(track.cy()); cz.add(track.cz());
+              xraster.add(track.xb()); yraster.add(track.yb());
+
           }
       }
     }
@@ -268,7 +286,7 @@ public class DCModule  extends Module {
 
       // loop over theta bins
       for( int i=0; i<theta_bins.length-1; i++ ){
-          
+
           GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i);
           analyze( i );
           
@@ -311,6 +329,17 @@ public class DCModule  extends Module {
       fitPol0( gP );
       fitPol0( gX );
       fitPol0( gY );
+
+      double trueZ = gZ.getFunction().getParameter(0);
+      for(int i=0; i<ox.size(); i++){
+        double param = (trueZ-oz.get(i))/cz.get(i);
+        double truex = ox.get(i) + param*cx.get(i);
+        double truey = oy.get(i) + param*cy.get(i);
+
+        this.getHistos().get("distribution").getH1F("xb00").fill(truex);
+        this.getHistos().get("distribution").getH1F("yb00").fill(truey);
+      }
+
     }
 
 
@@ -482,11 +511,13 @@ public class DCModule  extends Module {
       H1F hphi = this.getHistos().get("distribution").getH1F("phi");
       H1F hxb = this.getHistos().get("distribution").getH1F("xb");
       H1F hyb = this.getHistos().get("distribution").getH1F("yb");
+      H1F hxb00 = this.getHistos().get("distribution").getH1F("xb00");
+      H1F hyb00 = this.getHistos().get("distribution").getH1F("yb00");
 
       this.addCanvas( "distributions" );
       EmbeddedCanvas cdis = this.getCanvas().getCanvas( "distributions" );
 
-      cdis.divide(2,2);
+      cdis.divide(3,2);
       cdis.cd(0).setAxisTitleSize(18);
       cdis.draw( hvz );
       cdis.cd(1).setAxisTitleSize(18);
@@ -495,6 +526,10 @@ public class DCModule  extends Module {
       cdis.draw( hxb );
       cdis.cd(3).setAxisTitleSize(18);
       cdis.draw( hyb );
+      cdis.cd(4).setAxisTitleSize(18);
+      cdis.draw( hxb00 );
+      cdis.cd(5).setAxisTitleSize(18);
+      cdis.draw( hyb00 );
       
       // final results on all bins
       GraphErrors gZ = this.getHistos().get("fit_result").getGraph("gZ");
