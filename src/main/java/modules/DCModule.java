@@ -117,8 +117,8 @@ public class DCModule  extends Module {
       H1F h1_phi = new H1F( "phi", "phi distribution", 180, -30, 330 );   dg_distrib.addDataSet(h1_phi, 1);
       H1F h1_xb  = histo1D("xb", "xb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 2);
       H1F h1_yb  = histo1D("yb", "yb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 3);
-      H1F h1_xb00  = histo1D("xb00", "xb00 (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 4);
-      H1F h1_yb00  = histo1D("yb00", "yb00 (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 5);
+      H1F h1_xb00  = histo1D("xb00", "xb00 (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb00, 4);
+      H1F h1_yb00  = histo1D("yb00", "yb00 (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb00, 5);
       H1F h1_theta  = histo1D("theta", "theta (deg)", "Counts", 1000, -100, 100, 43);  dg_distrib.addDataSet(h1_theta, 6);
         
       // graphs for plotting the results as a function of theta
