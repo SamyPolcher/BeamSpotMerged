@@ -121,8 +121,8 @@ public class DCModule  extends Module {
       
       H1F h1_z   = new H1F( "vz",   "z vertex"  , 200, -20, 50 );         dg_distrib.addDataSet(h1_z, 0);
       H1F h1_phi = new H1F( "phi", "phi distribution", 180, -30, 330 );   dg_distrib.addDataSet(h1_phi, 1);
-      H1F h1_xb  = histo1D("xb", "xb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 2);
-      H1F h1_yb  = histo1D("yb", "yb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 3);
+      H1F h1_xb  = histo1D("xb", "vx (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 2);
+      H1F h1_yb  = histo1D("yb", "vy (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 3);
       H1F h1_vx  = histo1D("vx", "vx - xb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_vx, 4);
       H1F h1_vy  = histo1D("vy", "vy - yb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_vy, 5);
       H1F h1_theta  = histo1D("theta", "theta (deg)", "Counts", 1000, -100, 100, 43);  dg_distrib.addDataSet(h1_theta, 6);
@@ -240,13 +240,13 @@ public class DCModule  extends Module {
               // fill histograms
               this.getHistos().get("distribution").getH1F("vz").fill(vertex.z());
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
-              this.getHistos().get("distribution").getH1F("xb").fill(track.xb());
-              this.getHistos().get("distribution").getH1F("yb").fill(track.yb());
+              this.getHistos().get("distribution").getH1F("xb").fill(vertex.x());
+              this.getHistos().get("distribution").getH1F("yb").fill(vertex.y());
               this.getHistos().get("distribution").getH1F("vx").fill(vertex.x()-track.xb());
               this.getHistos().get("distribution").getH1F("vy").fill(vertex.y()-track.yb());
 
-              this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(track.vz(), phi);
-              this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(track.vz());
+              this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(vertex.z(), phi);
+              this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(vertex.z());
 
               // this.getHistos().get("track_eq").getData(0).add(track.ox());
               // this.getHistos().get("track_eq").getData(1).add(track.oy());
