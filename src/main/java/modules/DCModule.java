@@ -119,8 +119,8 @@ public class DCModule  extends Module {
       H1F h1_phi = new H1F( "phi", "phi distribution", 180, -30, 330 );   dg_distrib.addDataSet(h1_phi, 1);
       H1F h1_xb  = histo1D("xb", "xb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 2);
       H1F h1_yb  = histo1D("yb", "yb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 3);
-      H1F h1_xb00  = histo1D("xb00", "xb00 (cm)", "Counts", 10000, -10, 10, 43);  dg_distrib.addDataSet(h1_xb00, 4);
-      H1F h1_yb00  = histo1D("yb00", "yb00 (cm)", "Counts", 10000, -10, 10, 43);  dg_distrib.addDataSet(h1_yb00, 5);
+      H1F h1_vx  = histo1D("vx", "vx - xb (cm)", "Counts", 10000, -10, 10, 43);  dg_distrib.addDataSet(h1_vx, 4);
+      H1F h1_vy  = histo1D("vy", "vy - yb (cm)", "Counts", 10000, -10, 10, 43);  dg_distrib.addDataSet(h1_vy, 5);
       H1F h1_theta  = histo1D("theta", "theta (deg)", "Counts", 1000, -100, 100, 43);  dg_distrib.addDataSet(h1_theta, 6);
         
       // graphs for plotting the results as a function of theta
@@ -227,8 +227,8 @@ public class DCModule  extends Module {
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
               this.getHistos().get("distribution").getH1F("xb").fill(track.xb());
               this.getHistos().get("distribution").getH1F("yb").fill(track.yb());
-              this.getHistos().get("distribution").getH1F("xb00").fill(track.vx()-track.xb());
-              this.getHistos().get("distribution").getH1F("yb00").fill(track.vy()-track.yb());
+              this.getHistos().get("distribution").getH1F("vx").fill(track.vx()-track.xb());
+              this.getHistos().get("distribution").getH1F("vy").fill(track.vy()-track.yb());
 
               this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(track.vz(), phi);
               this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(track.vz());
@@ -256,8 +256,8 @@ public class DCModule  extends Module {
           this.fillFromDir1D(dg, "distribution", "phi");
           this.fillFromDir1D(dg, "distribution", "xb");
           this.fillFromDir1D(dg, "distribution", "yb");
-          // this.fillFromDir1D(dg, "distribution", "xb00");
-          // this.fillFromDir1D(dg, "distribution", "yb00");
+          this.fillFromDir1D(dg, "distribution", "vx");
+          this.fillFromDir1D(dg, "distribution", "vy");
         }
         else if(key=="z_phi"){
           for(int i=0; i<theta_bins.length-1; i++){
@@ -534,8 +534,8 @@ public class DCModule  extends Module {
       H1F hphi = this.getHistos().get("distribution").getH1F("phi");
       H1F hxb = this.getHistos().get("distribution").getH1F("xb");
       H1F hyb = this.getHistos().get("distribution").getH1F("yb");
-      H1F hxb00 = this.getHistos().get("distribution").getH1F("xb00");
-      H1F hyb00 = this.getHistos().get("distribution").getH1F("yb00");
+      H1F hvx = this.getHistos().get("distribution").getH1F("vx");
+      H1F hvy = this.getHistos().get("distribution").getH1F("vy");
 
       this.addCanvas( "distributions" );
       EmbeddedCanvas cdis = this.getCanvas().getCanvas( "distributions" );
@@ -550,9 +550,9 @@ public class DCModule  extends Module {
       cdis.cd(3).setAxisTitleSize(18);
       cdis.draw( hyb );
       cdis.cd(4).setAxisTitleSize(18);
-      cdis.draw( hxb00 );
+      cdis.draw( hvx );
       cdis.cd(5).setAxisTitleSize(18);
-      cdis.draw( hyb00 );
+      cdis.draw( hvy );
       
       // final results on all bins
       GraphErrors gZ = this.getHistos().get("fit_result").getGraph("gZ");
