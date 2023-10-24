@@ -14,6 +14,7 @@ import org.jlab.clas.physics.PhysicsEvent;
 import org.jlab.io.base.DataBank;
 
 import org.jlab.groot.data.GraphErrors;
+import org.jlab.groot.data.DataVector;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F;
 import org.jlab.groot.math.Axis;
@@ -60,6 +61,7 @@ public class DCModule  extends Module {
     Vector<Float> cz = new Vector();
     Vector<Float> xraster = new Vector();
     Vector<Float> yraster = new Vector();
+
 
     // 
     // ----------------------------------------- 
@@ -117,8 +119,8 @@ public class DCModule  extends Module {
       H1F h1_phi = new H1F( "phi", "phi distribution", 180, -30, 330 );   dg_distrib.addDataSet(h1_phi, 1);
       H1F h1_xb  = histo1D("xb", "xb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 2);
       H1F h1_yb  = histo1D("yb", "yb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 3);
-      H1F h1_xb00  = histo1D("xb00", "xb00 (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb00, 4);
-      H1F h1_yb00  = histo1D("yb00", "yb00 (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb00, 5);
+      H1F h1_xb00  = histo1D("xb00", "xb00 (cm)", "Counts", 10000, -10, 10, 43);  dg_distrib.addDataSet(h1_xb00, 4);
+      H1F h1_yb00  = histo1D("yb00", "yb00 (cm)", "Counts", 10000, -10, 10, 43);  dg_distrib.addDataSet(h1_yb00, 5);
       H1F h1_theta  = histo1D("theta", "theta (deg)", "Counts", 1000, -100, 100, 43);  dg_distrib.addDataSet(h1_theta, 6);
         
       // graphs for plotting the results as a function of theta
@@ -169,12 +171,21 @@ public class DCModule  extends Module {
               dg_z_slice.addDataSet(h1, NphiBin*i+j);
           }   
       }
+
+      // containers for track equation
+      // DataGroup dg_tracks = new DataGroup(1, 6);
+      // DataVector ox = new DataVector(); DataVector oy = new DataVector(); DataVector oz = new DataVector();
+      // DataVector cx = new DataVector(); DataVector cy = new DataVector(); DataVector cz = new DataVector();
+      // dg_tracks.addDataSet(ox, 0); dg_tracks.addDataSet(oy, 1); dg_tracks.addDataSet(oz, 2);
+      // dg_tracks.addDataSet(cx, 3); dg_tracks.addDataSet(cy, 4); dg_tracks.addDataSet(cz, 5);
+
       
       this.getHistos().put("distribution",  dg_distrib);
       this.getHistos().put("z_phi", dg_z_phi);
       this.getHistos().put("peak_position", dg_peak);
       this.getHistos().put("fit_result",  dg_fit_results);
       this.getHistos().put("z_slice",  dg_z_slice);
+      // this.getHistos().put("track_eq",  dg_tracks);
     }
 
     
@@ -216,13 +227,22 @@ public class DCModule  extends Module {
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
               this.getHistos().get("distribution").getH1F("xb").fill(track.xb());
               this.getHistos().get("distribution").getH1F("yb").fill(track.yb());
+              this.getHistos().get("distribution").getH1F("xb00").fill(track.vx()-track.xb());
+              this.getHistos().get("distribution").getH1F("yb00").fill(track.vy()-track.yb());
 
               this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(track.vz(), phi);
               this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(track.vz());
 
-              ox.add(track.ox()); oy.add(track.oy()); oz.add(track.oz());
-              cx.add(track.cx()); cy.add(track.cy()); cz.add(track.cz());
-              xraster.add(track.xb()); yraster.add(track.yb());
+              // this.getHistos().get("track_eq").getData(0).add(track.ox());
+              // this.getHistos().get("track_eq").getData(1).add(track.oy());
+              // this.getHistos().get("track_eq").getData(2).add(track.oz());
+              // this.getHistos().get("track_eq").getData(3).add(track.cx());
+              // this.getHistos().get("track_eq").getData(4).add(track.cy());
+              // this.getHistos().get("track_eq").getData(5).add(track.cz());
+
+              // ox.add(track.ox()); oy.add(track.oy()); oz.add(track.oz());
+              // cx.add(track.cx()); cy.add(track.cy()); cz.add(track.cz());
+              // xraster.add(track.xb()); yraster.add(track.yb());
 
           }
       }
@@ -236,6 +256,8 @@ public class DCModule  extends Module {
           this.fillFromDir1D(dg, "distribution", "phi");
           this.fillFromDir1D(dg, "distribution", "xb");
           this.fillFromDir1D(dg, "distribution", "yb");
+          // this.fillFromDir1D(dg, "distribution", "xb00");
+          // this.fillFromDir1D(dg, "distribution", "yb00");
         }
         else if(key=="z_phi"){
           for(int i=0; i<theta_bins.length-1; i++){
@@ -338,6 +360,7 @@ public class DCModule  extends Module {
 
         this.getHistos().get("distribution").getH1F("xb00").fill(truex);
         this.getHistos().get("distribution").getH1F("yb00").fill(truey);
+        System.out.println( "param " + param + " x " + truex + " y " + truey);
       }
 
     }
