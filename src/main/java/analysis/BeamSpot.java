@@ -40,12 +40,12 @@ public class BeamSpot {
 
     private static String OPTSTAT = "";
     
-    public BeamSpot(Boolean runCD, Boolean runDC, String opts, double[] thetaBins, float Ztarget, float zmin, float zmax, int NphiBins) {
-        this.init(runCD, runDC, opts, thetaBins, Ztarget, zmin, zmax, NphiBins);
+    public BeamSpot(Boolean runCD, Boolean runDC, String opts, double[] thetaBins, float Ztarget, float zmin, float zmax, int NphiBins, boolean relative) {
+        this.init(runCD, runDC, opts, thetaBins, Ztarget, zmin, zmax, NphiBins, relative);
     }
     
 
-    private void init(Boolean runCD, Boolean runDC, String opts, double[] thetaBins, float Ztarget, float zmin, float zmax, int NphiBins) {
+    private void init(Boolean runCD, Boolean runDC, String opts, double[] thetaBins, float Ztarget, float zmin, float zmax, int NphiBins, boolean relative) {
         OPTSTAT = opts;
         GStyle.getH1FAttributes().setOptStat(opts);
         GStyle.getAxisAttributesX().setTitleFontSize(24);
@@ -72,6 +72,7 @@ public class BeamSpot {
             dc.setThetaBins(thetaBins);
             dc.setTargetZ(Ztarget, zmin, zmax);
             dc.setBinsPerSector(NphiBins);
+            dc.setRelative(relative);
             dc.init();
             this.modules.add(dc);
         }
@@ -173,8 +174,8 @@ public class BeamSpot {
         parser.addOption("-X"          ,"0",    "do NOT save histograms in a hipo file");
         parser.addOption("-CD"         ,"1",    "set to 0 to deactivate CD beamspot analysis");
         parser.addOption("-DC"         ,"1",    "set to 0 to deactivate DC beamspot analysis");
-        parser.addOption("-x0"         ,"0",    "x position of the beam used in the reconstruction (average raster position if raster is used)");
-        parser.addOption("-y0"         ,"0",    "y position of the beam used in the reconstruction (average raster position if raster is used)");
+        parser.addOption("-x0"         ,"0",    "x offset (average raster position if raster is used)");
+        parser.addOption("-y0"         ,"0",    "y offset (average raster position if raster is used)");
 
         // histogram settings
         parser.addOption("-histo"      ,"0",    "read histogram from hipo file (0/1)");
@@ -187,6 +188,8 @@ public class BeamSpot {
         parser.addOption("-zmin", "0.", "lower bound of the foil fit window in z");
         parser.addOption("-zmax", "0.", "upper bound of the foil fit window in z");
         parser.addOption("-Nphi", "10", "phi bins per sector");
+        parser.addOption("-r"   ,"0",    "set to 1 to compute DC offset relative to the CCDB beam position used in cooking");
+        
 
         parser.parse(args);
         
@@ -208,8 +211,9 @@ public class BeamSpot {
         float  zmin           = (float)parser.getOption("-zmin").doubleValue();
         float  zmax           = (float)parser.getOption("-zmax").doubleValue();
         int NphiBins          = parser.getOption("-Nphi").intValue();
+        boolean relative      = (parser.getOption("-r").intValue()!=0);
         
-        // beam position in cooking
+        // beam position offset
         float  x0             = (float)parser.getOption("-x0").doubleValue();
         float  y0             = (float)parser.getOption("-y0").doubleValue();
         System.out.printf("nominal beam position (%2.3f, %2.3f) cm\n", x0, y0);
@@ -220,7 +224,7 @@ public class BeamSpot {
         // double[] thetaBins = new double[]{10,20,30};
         // double[] thetaBins = new double[]{10,11,12,13,14,16,18,22,30};
         double[] thetaBins = new double[]{10, 15, 20, 25, 30};
-        BeamSpot bs = new BeamSpot(runCD, runDC, optStats, thetaBins, zTarget, zmin, zmax, NphiBins);
+        BeamSpot bs = new BeamSpot(runCD, runDC, optStats, thetaBins, zTarget, zmin, zmax, NphiBins, relative);
         
         List<String> inputList = parser.getInputList();
         if(inputList.isEmpty()==true){

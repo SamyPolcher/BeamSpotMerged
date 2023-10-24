@@ -45,6 +45,7 @@ public class DCModule  extends Module {
     // -----------------------------------------
     int binsPerSector = 10;
     float targetZ = 25.4f;
+    boolean relative = false;
 
     // peak validity for the fit window:
     float fitMin = 0.f;
@@ -87,7 +88,7 @@ public class DCModule  extends Module {
     }
 
     public void setBinsPerSector( int n ) { binsPerSector = n; }
-        
+    public void setRelative(boolean b) {relative = b;}    
     
     // getters
     // -----------------------------------------
@@ -225,11 +226,16 @@ public class DCModule  extends Module {
               phiBin = -phiBin -2;
               if( phiBin < 0 || phiBin >= phi_bins.length - 1 ) continue;
 
-              // find vz of closest approach to a 0,0 beam position
-              Line3D t = new Line3D(new Point3D(track.vx(), track.vy(), track.vz()),
+              Point3D vertex;
+              if(relative){
+                vertex = new Point3D(track.vx(), track.vy(), track.vz());
+              }else{
+                // find vz of closest approach to a 0,0 beam position
+                Line3D t = new Line3D(new Point3D(track.vx(), track.vy(), track.vz()),
                                                    new Vector3D(track.px(), track.py(), track.pz()));
-              Line3D b = new Line3D(track.xb(), track.yb(), 0, 0, 0, 1);
-              Point3D vertex = t.distance(b).lerpPoint(0);
+                Line3D b = new Line3D(track.xb(), track.yb(), 0, 0, 0, 1);
+                vertex = t.distance(b).lerpPoint(0);
+              }
               
               // fill histograms
               this.getHistos().get("distribution").getH1F("vz").fill(vertex.z());
