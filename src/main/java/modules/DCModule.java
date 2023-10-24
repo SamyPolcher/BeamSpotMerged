@@ -12,6 +12,9 @@ import java.util.Vector;
 
 import org.jlab.clas.physics.PhysicsEvent;
 import org.jlab.io.base.DataBank;
+import org.jlab.geom.prim.Line3D;
+import org.jlab.geom.prim.Point3D;
+import org.jlab.geom.prim.Vector3D;
 
 import org.jlab.groot.data.GraphErrors;
 import org.jlab.groot.data.DataVector;
@@ -221,14 +224,20 @@ public class DCModule  extends Module {
               int phiBin = Arrays.binarySearch( phi_bins, phi );
               phiBin = -phiBin -2;
               if( phiBin < 0 || phiBin >= phi_bins.length - 1 ) continue;
+
+              // find vz of closest approach to a 0,0 beam position
+              Line3D t = new Line3D(new Point3D(track.vx(), track.vy(), track.vz()),
+                                                   new Vector3D(track.px(), track.py(), track.pz()));
+              Line3D b = new Line3D(track.xb(), track.yb(), 0, 0, 0, 1);
+              Point3D vertex = t.distance(b).lerpPoint(0);
               
               // fill histograms
-              this.getHistos().get("distribution").getH1F("vz").fill(track.vz());
+              this.getHistos().get("distribution").getH1F("vz").fill(vertex.z());
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
               this.getHistos().get("distribution").getH1F("xb").fill(track.xb());
               this.getHistos().get("distribution").getH1F("yb").fill(track.yb());
-              this.getHistos().get("distribution").getH1F("vx").fill(track.vx()-track.xb());
-              this.getHistos().get("distribution").getH1F("vy").fill(track.vy()-track.yb());
+              this.getHistos().get("distribution").getH1F("vx").fill(vertex.x());
+              this.getHistos().get("distribution").getH1F("vy").fill(vertex.y());
 
               this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(track.vz(), phi);
               this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(track.vz());
@@ -351,18 +360,6 @@ public class DCModule  extends Module {
       fitPol0( gP );
       fitPol0( gX );
       fitPol0( gY );
-
-      double trueZ = gZ.getFunction().getParameter(0);
-      for(int i=0; i<ox.size(); i++){
-        double param = (trueZ-oz.get(i))/cz.get(i);
-        double truex = ox.get(i) + param*cx.get(i);
-        double truey = oy.get(i) + param*cy.get(i);
-
-        this.getHistos().get("distribution").getH1F("xb00").fill(truex);
-        this.getHistos().get("distribution").getH1F("yb00").fill(truey);
-        System.out.println( "param " + param + " x " + truex + " y " + truey);
-      }
-
     }
 
 
