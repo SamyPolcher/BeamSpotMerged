@@ -244,8 +244,8 @@ public class DCModule  extends Module {
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
               this.getHistos().get("distribution").getH1F("xb").fill(track.xb());
               this.getHistos().get("distribution").getH1F("yb").fill(track.yb());
-              this.getHistos().get("distribution").getH1F("vx").fill(track.vx());
-              this.getHistos().get("distribution").getH1F("vy").fill(track.vy());
+              this.getHistos().get("distribution").getH1F("vx").fill(track.vx()-track.xb());
+              this.getHistos().get("distribution").getH1F("vy").fill(track.vy()-track.yb());
 
               this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(vertex.z(), phi);
               this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(vertex.z());
