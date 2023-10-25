@@ -231,7 +231,7 @@ public class DCModule  extends Module {
                 vertex = new Point3D(track.vx(), track.vy(), track.vz());
               }else{
                 // find vz of closest approach to a 0,0 beam position
-                Line3D t = new Line3D(new Point3D(track.vx(), track.vy(), track.vz()),
+                Line3D t = new Line3D(new Point3D(track.vx()-track.xb(), track.vy()-track.yb(), track.vz()),
                                                    new Vector3D(track.px(), track.py(), track.pz()));
                 // Line3D b = new Line3D(track.xb(), track.yb(), 0, 0, 0, 1);
                 Line3D b = new Line3D(-0.125, -0.228, 0, 0, 0, 1);
@@ -244,8 +244,8 @@ public class DCModule  extends Module {
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
               this.getHistos().get("distribution").getH1F("xb").fill(track.xb());
               this.getHistos().get("distribution").getH1F("yb").fill(track.yb());
-              this.getHistos().get("distribution").getH1F("vx").fill(track.vx()-track.xb());
-              this.getHistos().get("distribution").getH1F("vy").fill(track.vy()-track.yb());
+              this.getHistos().get("distribution").getH1F("vx").fill(vertex.x());
+              this.getHistos().get("distribution").getH1F("vy").fill(vertex.y());
 
               this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(vertex.z(), phi);
               this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(vertex.z());
