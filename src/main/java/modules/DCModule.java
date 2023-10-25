@@ -121,10 +121,10 @@ public class DCModule  extends Module {
       
       H1F h1_z   = new H1F( "vz",   "z vertex"  , 200, -20, 50 );         dg_distrib.addDataSet(h1_z, 0);
       H1F h1_phi = new H1F( "phi", "phi distribution", 180, -30, 330 );   dg_distrib.addDataSet(h1_phi, 1);
-      H1F h1_xb  = histo1D("xb", "xb (cm)", "Counts", 5000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 2);
-      H1F h1_yb  = histo1D("yb", "yb (cm)", "Counts", 5000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 3);
-      H1F h1_vx  = histo1D("vx", "vx (cm)", "Counts", 5000, -1, 1, 43);  dg_distrib.addDataSet(h1_vx, 4);
-      H1F h1_vy  = histo1D("vy", "vy (cm)", "Counts", 5000, -1, 1, 43);  dg_distrib.addDataSet(h1_vy, 5);
+      H1F h1_xb  = histo1D("xb", "xb (cm)", "Counts", 1000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 2);
+      H1F h1_yb  = histo1D("yb", "yb (cm)", "Counts", 1000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 3);
+      H1F h1_vx  = histo1D("vx", "vx (cm)", "Counts", 1000, -1, 1, 43);  dg_distrib.addDataSet(h1_vx, 4);
+      H1F h1_vy  = histo1D("vy", "vy (cm)", "Counts", 1000, -1, 1, 43);  dg_distrib.addDataSet(h1_vy, 5);
       H1F h1_theta  = histo1D("theta", "theta (deg)", "Counts", 1000, -100, 100, 43);  dg_distrib.addDataSet(h1_theta, 6);
         
       // graphs for plotting the results as a function of theta
@@ -233,9 +233,9 @@ public class DCModule  extends Module {
                 // find vz of closest approach to a 0,0 beam position
                 Line3D t = new Line3D(new Point3D(track.vx(), track.vy(), track.vz()),
                                                    new Vector3D(track.px(), track.py(), track.pz()));
-                // Line3D b = new Line3D(track.xb(), track.yb(), 0, 0, 0, 1);
+                Line3D b = new Line3D(track.xb(), track.yb(), 0, 0, 0, 1);
                 // Line3D b = new Line3D(-0.125, -0.228, 0, 0, 0, 1);
-                Line3D b = new Line3D(-0.13, -0.08, 0, 0, 0, 1);
+                // Line3D b = new Line3D(-0.13, -0.08, 0, 0, 0, 1);
                 vertex = t.distance(b).lerpPoint(0);
               }
               
@@ -244,8 +244,8 @@ public class DCModule  extends Module {
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
               this.getHistos().get("distribution").getH1F("xb").fill(track.xb());
               this.getHistos().get("distribution").getH1F("yb").fill(track.yb());
-              this.getHistos().get("distribution").getH1F("vx").fill(vertex.x()-track.xb());
-              this.getHistos().get("distribution").getH1F("vy").fill(vertex.y()-track.yb());
+              this.getHistos().get("distribution").getH1F("vx").fill(vertex.x();
+              this.getHistos().get("distribution").getH1F("vy").fill(vertex.y();
 
               this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(vertex.z(), phi);
               this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(vertex.z());
