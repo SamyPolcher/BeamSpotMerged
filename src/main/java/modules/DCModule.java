@@ -57,14 +57,14 @@ public class DCModule  extends Module {
     double[] z_bins;
 
     // vectors to keep the track line equation + raster position
-    Vector<Float> ox = new Vector();
-    Vector<Float> oy = new Vector();
-    Vector<Float> oz = new Vector();
-    Vector<Float> cx = new Vector();
-    Vector<Float> cy = new Vector();
-    Vector<Float> cz = new Vector();
-    Vector<Float> xraster = new Vector();
-    Vector<Float> yraster = new Vector();
+    // Vector<Float> ox = new Vector();
+    // Vector<Float> oy = new Vector();
+    // Vector<Float> oz = new Vector();
+    // Vector<Float> cx = new Vector();
+    // Vector<Float> cy = new Vector();
+    // Vector<Float> cz = new Vector();
+    // Vector<Float> xraster = new Vector();
+    // Vector<Float> yraster = new Vector();
 
 
     // 
@@ -242,8 +242,8 @@ public class DCModule  extends Module {
               // fill histograms
               this.getHistos().get("distribution").getH1F("vz").fill(vertex.z());
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
-              this.getHistos().get("distribution").getH1F("xb").fill(vertex.x());
-              this.getHistos().get("distribution").getH1F("yb").fill(vertex.y());
+              this.getHistos().get("distribution").getH1F("xb").fill(track.xb());
+              this.getHistos().get("distribution").getH1F("yb").fill(track.yb());
               this.getHistos().get("distribution").getH1F("vx").fill(vertex.x()-track.xb());
               this.getHistos().get("distribution").getH1F("vy").fill(vertex.y()-track.yb());
 
