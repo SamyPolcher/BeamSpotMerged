@@ -155,7 +155,6 @@ public class Event {
     private void readFDTracks(DataEvent event) {
         DataBank recPart   = this.getBank(event, "REC::Particle");
         DataBank recTrack  = this.getBank(event, "REC::Track");
-        DataBank recTraj  = this.getBank(event, "REC::Traj");
         DataBank runConfig = this.getBank(event, "RUN::config");
         DataBank rasterPos = this.getBank(event, "RASTER::position");
        
@@ -164,7 +163,6 @@ public class Event {
                 Track track = Track.readParticle(recPart, recTrack, i);
                 if(track.getDetector()!=2 || track.charge()==0) continue;
                 if(runConfig != null) track.addScale(runConfig);
-                if(recTraj != null) track.addTraj(recTraj, i);
                 if(rasterPos != null){
                     track.setxbyb(rasterPos.getFloat("x", 0) + x0, rasterPos.getFloat("y", 0) + y0);
                 }else{
