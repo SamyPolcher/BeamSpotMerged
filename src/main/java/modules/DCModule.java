@@ -236,7 +236,7 @@ public class DCModule  extends Module {
                 // Line3D b = new Line3D(track.xb(), track.yb(), 0, 0, 0, 1);
                 // Line3D b = new Line3D(0, 0, 0, 0, 0, 1);
                 // Line3D b = new Line3D(-0.2, -0.0, 0, 0, 0, 1);
-                Line3D b = new Line3D(-0.13, -0.08, 0, 0, 0, 1);
+                Line3D b = new Line3D(0.13, 0.08, 0, 0, 0, 1);
                 vertex = t.distance(b).lerpPoint(0);
               }
               
