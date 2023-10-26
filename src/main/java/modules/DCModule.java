@@ -231,9 +231,10 @@ public class DCModule  extends Module {
                 vertex = new Point3D(track.vx(), track.vy(), track.vz());
               }else{
                 // find vz of closest approach to a 0,0 beam position
-                Line3D t = new Line3D(new Point3D(track.vx(), track.vy(), track.vz()),
+                Line3D t = new Line3D(new Point3D(track.vx()-track.xb(), track.vy()-track.yb(), track.vz()),
                                                    new Vector3D(track.px(), track.py(), track.pz()));
-                Line3D b = new Line3D(-track.xb(), -track.yb(), 0, 0, 0, 1);
+                // Line3D b = new Line3D(track.xb(), track.yb(), 0, 0, 0, 1);
+                Line3D b = new Line3D(0, 0, 0, 0, 0, 1);
                 // Line3D b = new Line3D(-0.2, -0.0, 0, 0, 0, 1);
                 // Line3D b = new Line3D(-0.13, -0.08, 0, 0, 0, 1);
                 vertex = t.distance(b).lerpPoint(0);
