@@ -234,9 +234,9 @@ public class DCModule  extends Module {
                 Line3D t = new Line3D(new Point3D(track.vx()-track.xb(), track.vy()-track.yb(), track.vz()),
                                                    new Vector3D(track.px(), track.py(), track.pz()));
                 // Line3D b = new Line3D(track.xb(), track.yb(), 0, 0, 0, 1);
-                // Line3D b = new Line3D(0, 0, 0, 0, 0, 1);
+                Line3D b = new Line3D(0, 0, 0, 0, 0, 1);
                 // Line3D b = new Line3D(-0.2, -0.0, 0, 0, 0, 1);
-                Line3D b = new Line3D(0.13, 0.08, 0, 0, 0, 1);
+                // Line3D b = new Line3D(0.13, 0.08, 0, 0, 0, 1);
                 vertex = t.distance(b).lerpPoint(0);
               }
               
@@ -662,14 +662,14 @@ public class DCModule  extends Module {
             PrintWriter wr = new PrintWriter( outputPrefix+"_DC_ccdb_table.txt" );
             wr.printf( "# x y ex ey in cm\n" );
             wr.printf( "0 0 0 " );
-            wr.printf(  "%.3f %.3f %.3f %.3f\n", xb+vx, yb+vy, e_vx, e_vy);
-            wr.printf( "# absolute position with respect to an average beam position: %3f %3f \n", xb, yb);
+            wr.printf(  "%.3f %.3f %.3f %.3f\n", vx, vy, e_vx, e_vy);
+            wr.printf( "# Average beam position xbyb: %3f %3f \n", xb, yb);
             wr.close();
             System.out.println(wr);
 
             System.out.printf("\nDrift Chambers\n");
-            System.out.printf("Absolute beamspot x: (%2.3f +/- %2.3f) cm, y: (%2.3f +/- %2.3f) cm\n", xb+vx, e_vx, yb+vy, e_vy);
-            System.out.printf("  with respect to average beam position: (%2.3f, %2.3f) cm\n", xb, yb);
+            System.out.printf("Beamspot offset x: (%2.3f +/- %2.3f) cm, y: (%2.3f +/- %2.3f) cm\n", vx, e_vx, vy, e_vy);
+            System.out.printf("# Average beam position xbyb: %3f %3f \n", xb, yb);
         } catch ( IOException e ) {}
     }
 }
