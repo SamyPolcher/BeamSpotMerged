@@ -160,7 +160,7 @@ public class CDModule extends Module {
                                       Math.pow(f1.getParameter(0)*Math.cos(f1.getParameter(2))*f1.parameter(2).error(),2));
 
             if(name == "UNegatives"){
-                vxRef = xb+dx; vyRef = yb+dy;
+                vxRef = dx; vyRef = dy;
                 e_vxRef = edx; e_vyRef = edy;
                 xbRef = xb;
                 ybRef = yb;
