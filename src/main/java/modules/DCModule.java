@@ -8,11 +8,16 @@ import java.util.Arrays;
 import java.util.List;
 import javax.swing.JFrame;
 import java.awt.Dimension;
+import java.util.Vector;
 
 import org.jlab.clas.physics.PhysicsEvent;
 import org.jlab.io.base.DataBank;
+import org.jlab.geom.prim.Line3D;
+import org.jlab.geom.prim.Point3D;
+import org.jlab.geom.prim.Vector3D;
 
 import org.jlab.groot.data.GraphErrors;
+import org.jlab.groot.data.DataVector;
 import org.jlab.groot.data.H1F;
 import org.jlab.groot.data.H2F;
 import org.jlab.groot.math.Axis;
@@ -40,6 +45,7 @@ public class DCModule  extends Module {
     // -----------------------------------------
     int binsPerSector = 10;
     float targetZ = 25.4f;
+    boolean relative = false;
 
     // peak validity for the fit window:
     float fitMin = 0.f;
@@ -49,6 +55,17 @@ public class DCModule  extends Module {
     double[] theta_bins;
     double[] phi_bins;
     double[] z_bins;
+
+    // vectors to keep the track line equation + raster position
+    // Vector<Float> ox = new Vector();
+    // Vector<Float> oy = new Vector();
+    // Vector<Float> oz = new Vector();
+    // Vector<Float> cx = new Vector();
+    // Vector<Float> cy = new Vector();
+    // Vector<Float> cz = new Vector();
+    // Vector<Float> xraster = new Vector();
+    // Vector<Float> yraster = new Vector();
+
 
     // 
     // ----------------------------------------- 
@@ -71,7 +88,7 @@ public class DCModule  extends Module {
     }
 
     public void setBinsPerSector( int n ) { binsPerSector = n; }
-        
+    public void setRelative(boolean b) {relative = b;}    
     
     // getters
     // -----------------------------------------
@@ -97,16 +114,18 @@ public class DCModule  extends Module {
       DataGroup dg_z_slice = new DataGroup(NphiBin, theta_bins.length-1);
       
       // containers for general 1D histograms, z and phi distributions, xb, yb distrib
-      DataGroup dg_distrib = new DataGroup(1, 5);
+      DataGroup dg_distrib = new DataGroup(1, 7);
       
       // containers for for plotting the fits results as a function of theta
       DataGroup dg_fit_results = new DataGroup(1, 5);
       
       H1F h1_z   = new H1F( "vz",   "z vertex"  , 200, -20, 50 );         dg_distrib.addDataSet(h1_z, 0);
       H1F h1_phi = new H1F( "phi", "phi distribution", 180, -30, 330 );   dg_distrib.addDataSet(h1_phi, 1);
-      H1F h1_xb  = histo1D("xb", "xb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 2);
-      H1F h1_yb  = histo1D("yb", "yb (cm)", "Counts", 10000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 3);
-      H1F h1_theta  = histo1D("theta", "theta (deg)", "Counts", 1000, -100, 100, 43);  dg_distrib.addDataSet(h1_theta, 4);
+      H1F h1_xb  = histo1D("xb", "xb (cm)", "Counts", 1000, -1, 1, 43);  dg_distrib.addDataSet(h1_xb, 2);
+      H1F h1_yb  = histo1D("yb", "yb (cm)", "Counts", 1000, -1, 1, 43);  dg_distrib.addDataSet(h1_yb, 3);
+      H1F h1_vx  = histo1D("vx", "vx (cm)", "Counts", 1000, -1, 1, 43);  dg_distrib.addDataSet(h1_vx, 4);
+      H1F h1_vy  = histo1D("vy", "vy (cm)", "Counts", 1000, -1, 1, 43);  dg_distrib.addDataSet(h1_vy, 5);
+      H1F h1_theta  = histo1D("theta", "theta (deg)", "Counts", 1000, -100, 100, 43);  dg_distrib.addDataSet(h1_theta, 6);
         
       // graphs for plotting the results as a function of theta
       GraphErrors gZ = new GraphErrors("gZ");  // Z 
@@ -156,12 +175,21 @@ public class DCModule  extends Module {
               dg_z_slice.addDataSet(h1, NphiBin*i+j);
           }   
       }
+
+      // containers for track equation
+      // DataGroup dg_tracks = new DataGroup(1, 6);
+      // DataVector ox = new DataVector(); DataVector oy = new DataVector(); DataVector oz = new DataVector();
+      // DataVector cx = new DataVector(); DataVector cy = new DataVector(); DataVector cz = new DataVector();
+      // dg_tracks.addDataSet(ox, 0); dg_tracks.addDataSet(oy, 1); dg_tracks.addDataSet(oz, 2);
+      // dg_tracks.addDataSet(cx, 3); dg_tracks.addDataSet(cy, 4); dg_tracks.addDataSet(cz, 5);
+
       
       this.getHistos().put("distribution",  dg_distrib);
       this.getHistos().put("z_phi", dg_z_phi);
       this.getHistos().put("peak_position", dg_peak);
       this.getHistos().put("fit_result",  dg_fit_results);
       this.getHistos().put("z_slice",  dg_z_slice);
+      // this.getHistos().put("track_eq",  dg_tracks);
     }
 
     
@@ -197,15 +225,47 @@ public class DCModule  extends Module {
               int phiBin = Arrays.binarySearch( phi_bins, phi );
               phiBin = -phiBin -2;
               if( phiBin < 0 || phiBin >= phi_bins.length - 1 ) continue;
+
+              Point3D vertex;
+              if(relative){
+                vertex = new Point3D(track.vx(), track.vy(), track.vz());
+              }else{
+                // find vz of closest approach to a 0,0 beam position
+                Line3D t = new Line3D(new Point3D(track.vx()-track.xb(), track.vy()-track.yb(), track.vz()),
+                                                   new Vector3D(track.px(), track.py(), track.pz()));
+
+                // Line3D t = new Line3D(new Point3D(track.vx(), track.vy(), track.vz()),
+                                                  //  new Vector3D(track.px(), track.py(), track.pz()));
+                // Line3D b = new Line3D(new Point3D(track.xb(), track.yb(), 0), new Vector3D(0., 0., 1.));
+
+                Line3D b = new Line3D(new Point3D(0., 0., 0.), new Vector3D(0., 0., 1.));
+                // Line3D b = new Line3D(-0.2, -0.0, 0, 0, 0, 1);
+                // Line3D b = new Line3D(0.13, 0.08, 0, 0, 0, 1);
+                vertex = t.distance(b).lerpPoint(0);
+              }
               
               // fill histograms
-              this.getHistos().get("distribution").getH1F("vz").fill(track.vz());
+              this.getHistos().get("distribution").getH1F("vz").fill(vertex.z());
               this.getHistos().get("distribution").getH1F("phi").fill(phi);
               this.getHistos().get("distribution").getH1F("xb").fill(track.xb());
               this.getHistos().get("distribution").getH1F("yb").fill(track.yb());
+              this.getHistos().get("distribution").getH1F("vx").fill(vertex.x());
+              this.getHistos().get("distribution").getH1F("vy").fill(vertex.y());
 
-              this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(track.vz(), phi);
-              this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(track.vz());
+              this.getHistos().get("z_phi").getH2F("z_phi_"+thetaBin).fill(vertex.z(), phi);
+              this.getHistos().get("z_slice").getH1F("slice_"+ thetaBin+"_"+phiBin).fill(vertex.z());
+
+              // this.getHistos().get("track_eq").getData(0).add(track.ox());
+              // this.getHistos().get("track_eq").getData(1).add(track.oy());
+              // this.getHistos().get("track_eq").getData(2).add(track.oz());
+              // this.getHistos().get("track_eq").getData(3).add(track.cx());
+              // this.getHistos().get("track_eq").getData(4).add(track.cy());
+              // this.getHistos().get("track_eq").getData(5).add(track.cz());
+
+              // ox.add(track.ox()); oy.add(track.oy()); oz.add(track.oz());
+              // cx.add(track.cx()); cy.add(track.cy()); cz.add(track.cz());
+              // xraster.add(track.xb()); yraster.add(track.yb());
+
           }
       }
     }
@@ -218,6 +278,8 @@ public class DCModule  extends Module {
           this.fillFromDir1D(dg, "distribution", "phi");
           this.fillFromDir1D(dg, "distribution", "xb");
           this.fillFromDir1D(dg, "distribution", "yb");
+          this.fillFromDir1D(dg, "distribution", "vx");
+          this.fillFromDir1D(dg, "distribution", "vy");
         }
         else if(key=="z_phi"){
           for(int i=0; i<theta_bins.length-1; i++){
@@ -268,7 +330,7 @@ public class DCModule  extends Module {
 
       // loop over theta bins
       for( int i=0; i<theta_bins.length-1; i++ ){
-          
+
           GraphErrors g_peak = this.getHistos().get("peak_position").getGraph("g_"+i);
           analyze( i );
           
@@ -482,11 +544,13 @@ public class DCModule  extends Module {
       H1F hphi = this.getHistos().get("distribution").getH1F("phi");
       H1F hxb = this.getHistos().get("distribution").getH1F("xb");
       H1F hyb = this.getHistos().get("distribution").getH1F("yb");
+      H1F hvx = this.getHistos().get("distribution").getH1F("vx");
+      H1F hvy = this.getHistos().get("distribution").getH1F("vy");
 
       this.addCanvas( "distributions" );
       EmbeddedCanvas cdis = this.getCanvas().getCanvas( "distributions" );
 
-      cdis.divide(2,2);
+      cdis.divide(3,2);
       cdis.cd(0).setAxisTitleSize(18);
       cdis.draw( hvz );
       cdis.cd(1).setAxisTitleSize(18);
@@ -495,6 +559,10 @@ public class DCModule  extends Module {
       cdis.draw( hxb );
       cdis.cd(3).setAxisTitleSize(18);
       cdis.draw( hyb );
+      cdis.cd(4).setAxisTitleSize(18);
+      cdis.draw( hvx );
+      cdis.cd(5).setAxisTitleSize(18);
+      cdis.draw( hvy );
       
       // final results on all bins
       GraphErrors gZ = this.getHistos().get("fit_result").getGraph("gZ");
@@ -598,14 +666,14 @@ public class DCModule  extends Module {
             PrintWriter wr = new PrintWriter( outputPrefix+"_DC_ccdb_table.txt" );
             wr.printf( "# x y ex ey in cm\n" );
             wr.printf( "0 0 0 " );
-            wr.printf(  "%.3f %.3f %.3f %.3f\n", xb+vx, yb+vy, e_vx, e_vy);
-            wr.printf( "# absolute position with respect to an average beam position: %3f %3f \n", xb, yb);
+            wr.printf(  "%.3f %.3f %.3f %.3f\n", vx, vy, e_vx, e_vy);
+            wr.printf( "# Average beam position xbyb: %3f %3f \n", xb, yb);
             wr.close();
             System.out.println(wr);
 
             System.out.printf("\nDrift Chambers\n");
-            System.out.printf("Absolute beamspot x: (%2.3f +/- %2.3f) cm, y: (%2.3f +/- %2.3f) cm\n", xb+vx, e_vx, yb+vy, e_vy);
-            System.out.printf("  with respect to average beam position: (%2.3f, %2.3f) cm\n", xb, yb);
+            System.out.printf("Beamspot offset x: (%2.3f +/- %2.3f) cm, y: (%2.3f +/- %2.3f) cm\n", vx, e_vx, vy, e_vy);
+            System.out.printf("# Average beam position xbyb: %3f %3f \n", xb, yb);
         } catch ( IOException e ) {}
     }
 }

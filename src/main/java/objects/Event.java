@@ -162,8 +162,8 @@ public class Event {
             for (int i = 0; i < recPart.rows(); i++) {    
                 Track track = Track.readParticle(recPart, recTrack, i);
                 if(track.getDetector()!=2 || track.charge()==0) continue;
-                if(runConfig!=null) track.addScale(runConfig);
-                if(rasterPos!=null){
+                if(runConfig != null) track.addScale(runConfig);
+                if(rasterPos != null){
                     track.setxbyb(rasterPos.getFloat("x", 0) + x0, rasterPos.getFloat("y", 0) + y0);
                 }else{
                     track.setxbyb(x0, y0);

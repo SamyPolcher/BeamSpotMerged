@@ -160,7 +160,7 @@ public class CDModule extends Module {
                                       Math.pow(f1.getParameter(0)*Math.cos(f1.getParameter(2))*f1.parameter(2).error(),2));
 
             if(name == "UNegatives"){
-                vxRef = xb+dx; vyRef = yb+dy;
+                vxRef = dx; vyRef = dy;
                 e_vxRef = edx; e_vyRef = edy;
                 xbRef = xb;
                 ybRef = yb;
@@ -228,12 +228,12 @@ public class CDModule extends Module {
             wr.printf( "# x y ex ey only negative tracks in cm\n" );
             wr.printf( "0 0 0 " );
             wr.printf(  "%.3f %.3f %.3f %.3f\n", vxRef, vyRef, e_vxRef, e_vyRef);
-            wr.printf( "# absolute position with respect to an average beam position: %3f %3f \n", xbRef, ybRef);
+            wr.printf( "# Average beam position xbyb: %3f %3f \n", xbRef, ybRef);
             wr.close();
 
             System.out.printf("\nCentral Detector\n");
             System.out.printf("Absolute beamspot x: (%2.3f +/- %2.3f) cm, y: (%2.3f +/- %2.3f) cm\n", vxRef, e_vxRef, vyRef, e_vyRef);
-            System.out.printf("  with respect to average beam position: (%2.3f, %2.3f) cm\n", xbRef, ybRef);
+            System.out.printf("# Average beam position xbyb: (%2.3f, %2.3f) cm\n", xbRef, ybRef);
 
         } catch ( IOException e ) {}
     }
