@@ -31,6 +31,7 @@ import org.jlab.groot.math.F1D;
 import org.jlab.groot.math.Func1D;
 import org.jlab.groot.graphics.GraphicsAxis;
 import org.jlab.groot.data.TDirectory;
+import org.jlab.groot.ui.PaveText;
 
 import analysis.Module;
 import objects.Track;
@@ -401,7 +402,7 @@ public class DCModule  extends Module {
         if( h.integral( h.getAxis().getBin(fitMin) , h.getAxis().getBin(fitMax) ) < 30 ) continue;
 
         // the fit function of the target window peak, a gaussian for simplicity
-        F1D func = new F1D( "func_"+thetaBin+"_"+i, "[amp]*gaus(x,[mean],[sigma]) + [c] + [d]*x", fitMin, fitMax );
+        F1D func = new F1D( "func_"+thetaBin+"_"+i, "[amp]*gaus(x,[mean],[sigma]) + [c]", fitMin, fitMax );
         func.setParameter(0, h.getBinContent( h.getMaximumBin() ) );
 
         func.setParameter(1, this.getMeanInInterval(h, fitMin, fitMax) );
@@ -411,23 +412,24 @@ public class DCModule  extends Module {
         func.setParLimits(2, 0.3, 1);
 
         func.setParameter(3, 1. );
-        func.setParameter(4, .01 );
+        // func.setParameter(4, .01 );
         func.setOptStat(110);
         DataFitter.fit( func, h, "Q" );
-        
+
         // skip if Gaussian amplitude too small:
-        if (func.getParameter(0) < 8) continue;
+        // if (func.getParameter(0) < 20) continue;
+        if(func.evaluate(func.getParameter(1))/func.getParameter(3) < 2.) continue;
 
         // skip if Gaussian sigma too small:
         if (Math.abs(func.getParameter(2)) < 0.1) continue;
 
         // skip if Gaussian sigma too big:
-        if (Math.abs(func.getParameter(2)) > 2) continue;
+        if (Math.abs(func.getParameter(2)) > 2.) continue;
 
 
         // skip if chi-square bad:
         if (func.getChiSquare()/func.getNDF() < 0.05) continue;
-        if (func.getChiSquare()/func.getNDF() > 10) continue;
+        if (func.getChiSquare()/func.getNDF() > 10.) continue;
 
         // store the fit result in the corresponding graph
         // g_peak.addPoint( 
@@ -623,6 +625,7 @@ public class DCModule  extends Module {
               func.setLineColor( 2 );
               func.setLineWidth( 2 );
               func.setOptStat(1110);
+              System.out.println("amp/param3=" + String.format("%.2f", func.evaluate(func.getParameter(1))/func.getParameter(3)));
           } // else System.out.println("fit for z slice " + i + ":" + j + " is empty");
           ci.setAxisLabelSize(8);
           ci.setAxisLabelSize(8);
@@ -633,9 +636,9 @@ public class DCModule  extends Module {
           ci.draw( h );
           
           if(func != null) {
-              F1D fb = new F1D( "fb"+h.getName(), "[c]+[d]*x", func.getMin(), func.getMax() );
+              F1D fb = new F1D( "fb"+h.getName(), "[c]", func.getMin(), func.getMax() );
               fb.setParameter(0, func.getParameter(3) );
-              fb.setParameter(1, func.getParameter(4) );
+              // fb.setParameter(1, func.getParameter(4) );
               fb.setLineColor(5);
               fb.setLineWidth(2);
               ci.draw(fb,"same");

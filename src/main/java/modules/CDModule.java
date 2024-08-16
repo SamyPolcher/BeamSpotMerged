@@ -150,8 +150,10 @@ public class CDModule extends Module {
             System.out.printf("d0(phi) = p0 sin(p1 x + p2):\n");
             for(int i=0; i<f1.getNPars(); i++)
                 System.out.printf("\t p%d = (%.4f +/- %.4f)\n", i, f1.getParameter(i), f1.parameter(i).error());
+   
             double xb =  this.getHistos().get(name).getH1F("hi_xb").getMean();
             double yb =  this.getHistos().get(name).getH1F("hi_yb").getMean();
+            System.out.printf("xb=%.3f, yb=%.3f\n", xb, yb);
             double dx = -f1.getParameter(0)*Math.cos(f1.getParameter(2));
             double dy =  f1.getParameter(0)*Math.sin(f1.getParameter(2));
             double edx = Math.sqrt(Math.pow(f1.parameter(0).error()*Math.cos(f1.getParameter(2)),2)+
