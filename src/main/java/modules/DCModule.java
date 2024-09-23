@@ -404,6 +404,7 @@ public class DCModule  extends Module {
         // the fit function of the target window peak, a gaussian for simplicity
         F1D func = new F1D( "func_"+thetaBin+"_"+i, "[amp]*gaus(x,[mean],[sigma]) + [c]", fitMin, fitMax );
         func.setParameter(0, h.getBinContent( h.getMaximumBin() ) );
+        func.setParLimits(0, 0., 1e9);
 
         func.setParameter(1, this.getMeanInInterval(h, fitMin, fitMax) );
         func.setParLimits(1, fitMin, fitMax);
@@ -429,7 +430,7 @@ public class DCModule  extends Module {
 
         // skip if chi-square bad:
         if (func.getChiSquare()/func.getNDF() < 0.05) continue;
-        if (func.getChiSquare()/func.getNDF() > 10.) continue;
+        if (func.getChiSquare()/func.getNDF() > 100.) continue;
 
         // store the fit result in the corresponding graph
         // g_peak.addPoint( 

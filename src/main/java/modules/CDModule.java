@@ -30,8 +30,8 @@ public class CDModule extends Module {
     private final double PHIMAX = 180.0;
     private final double THETAMIN = 40.0;
     private final double THETAMAX = 100.0;
-    private final double VXYMIN = -1.0;
-    private final double VXYMAX =  1.0;
+    private final double VXYMIN = -1.5;
+    private final double VXYMAX =  1.5;
     private final double VZMIN = -12; //-26;
     private final double VZMAX =  15;//26;
     
